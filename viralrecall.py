@@ -20,6 +20,18 @@ def predict_proteins(genome_file, project, redo):
 		subprocess.call(cmd2, stdout=open("out.txt", "w"), stderr=open("err.txt", "w"))
 	return protein_file
 
+	# get vog hmm descriptions
+def get_annot(annot_file):
+	input = open(annot_file, "r")
+	vog_desc = {}
+	for i in input.readlines():
+		line = i.rstrip()
+		tabs = line.split("\t")
+		vog = tabs[0]
+		desc = tabs[4]
+		vog_desc[vog] = desc
+	return vog_desc
+		
 # get SeqIO dictionary of input nucleic acid FASTA file
 def get_fasta(genome_file):
 	genome_dict = SeqIO.to_dict(SeqIO.parse(genome_file, "fasta"))
@@ -107,10 +119,15 @@ def parse_hmmout(hmmout):
 			hit = tabs[2]
 			eval = float(tabs[4])
 			score = float(tabs[5])
-
 			if score > bit_dict[protein]:
-				bit_dict[protein] = score
-				hit_dict[protein] = hit
+				if hit == "VOG02293" or hit == "VOG04678" or hit == "VOG01352" or hit == "VOG09752":
+					print(protein, hit, score)
+					pass
+					#hit = ""
+					#bit = float(0)
+				else:
+					bit_dict[protein] = score
+					hit_dict[protein] = hit
 			else:
 				pass
 	return hit_dict, bit_dict
@@ -164,6 +181,11 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 	vog_hit, vog_bit = parse_hmmout(vog_out)
 	pfam_hit, pfam_bit = parse_hmmout(pfam_out)
 
+	vog_desc = get_annot("hmm/vog.annotations.tsv")
+	vog_annot = {}
+	for i in vog_hit:
+		vog_annot[i] = vog_desc[vog_hit[i]]
+		
 	# get protein features from Prodigal FASTA headers
 	seqs, strands, prot2start, prot2end, prot2contig, record_dict = get_seqlist(protein_file)
 
@@ -171,9 +193,9 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 	genome_dict = get_fasta(input)
 	
 	# set up Pandas DataFrame of the full genome annotation
-	names = ['replicon', 'vog', 'vogbit', 'pfam', 'pfambit', 'protlength', 'strand', 'start', 'end']
+	names = ['replicon', 'vog', 'vogbit', 'vog_desc', 'pfam', 'pfambit', 'protlength', 'strand', 'start', 'end']
 	df = pandas.DataFrame()
-	for index, i in enumerate([prot2contig, vog_hit, vog_bit, pfam_hit, pfam_bit, seqs, strands, prot2start, prot2end]):
+	for index, i in enumerate([prot2contig, vog_hit, vog_bit, vog_annot, pfam_hit, pfam_bit, seqs, strands, prot2start, prot2end]):
 		s1 = pandas.DataFrame(pandas.Series(i, name = names[index]))
 		df = pandas.concat([df, s1], axis=1, sort=True)
 
@@ -211,7 +233,7 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 		contig_bounds.append(new_end)
 
 	df2 = df2.sort_values(by=["cumsum"])
-#	df2.fillna(0, inplace=True, axis=1)
+	df2.fillna(0, inplace=True, axis=1)
 
 	# now let's get the regions of the entire genome file that have a net positive prophage signal
 	reg = get_regions(df2["rolling"].tolist())
@@ -273,7 +295,8 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 		bound_labels = list(range(int(0), maxbound_label+1))
 		bounds = [item*1000000 for item in bound_labels]
 
-		val = max(df2["rolling"])/10
+		val = numpy.nanmax(df2["rolling"])/10
+		print(contig_bounds, val)
 		plt.vlines(contig_bounds, 0, val, colors="red", zorder=20)
 		plt.plot(df2["cumsum"], df2["rolling"])
 		plt.xticks([])
@@ -291,7 +314,7 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 ########################################################################
 def main(argv=None):
 
-	args_parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description="ViralRecall: Predicting prophage-like regions in prokaryotic genomes \nFrank O. Aylward, Assistant Professor, Virginia Tech Department of Biological Sciences <faylward at vt dot edu>", epilog='!!!\nIf you use this tool in a publication please do not forget to cite:\nProdigal (DOI 10.1186/1471-2105-11-119)\nHMMER3 (DOI 10.1371/journal.pcbi.1002195)\n!!!')
+	args_parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description="ViralRecall: Predicting prophage-like regions in prokaryotic genomes \nFrank O. Aylward, Assistant Professor, Virginia Tech Department of Biological Sciences <faylward at vt dot edu>", epilog='*******************************************************************\nIf you use this tool in a publication please do not forget to cite:\nProdigal (DOI 10.1186/1471-2105-11-119)\nHMMER3 (DOI 10.1371/journal.pcbi.1002195)\n*******************************************************************')
 	args_parser.add_argument('-i', '--input', required=True, help='Input FASTA file (ending in .fna)')
 	args_parser.add_argument('-p', '--project', required=True, help='project name for outputs')
 	args_parser.add_argument('-w', '--window', required=False, default=int(15), help='sliding window size to use for detecting prophage regions (default=15)')
