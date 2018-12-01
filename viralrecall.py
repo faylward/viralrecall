@@ -12,9 +12,14 @@ vogdb = "hmm/vogdb.hmm"
 pfam = "hmm/pfam.reduced.hmm"
 
 # predict proteins from genome FNA file
-def predict_proteins(genome_file, project, redo):
-	protein_file = os.path.join(project, re.sub(".fna", ".faa", genome_file))
+def predict_proteins(genome_file, project, redo, batch):
+	if batch:	
+		protein_file = project+".faa"
+	else:
+		protein_file = os.path.join(project, re.sub('.fna', '.faa', genome_file))
+	
 	cmd = "prodigal -i "+ genome_file +" -a "+ protein_file
+	#print(cmd)
 	cmd2 = shlex.split(cmd)
 	if not redo:
 		subprocess.call(cmd2, stdout=open("out.txt", "w"), stderr=open("err.txt", "w"))
@@ -162,7 +167,7 @@ def get_regions(list1):
 	return index_list
 
 # main function that runs the program
-def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking):
+def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch):
 
 	# create output directories
 	if os.path.isdir(project):
@@ -174,7 +179,7 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 		os.mkdir(project)
 
 	# predict proteins, run HMMER3 searches, and parse outputs
-	protein_file = predict_proteins(input, project, redo)
+	protein_file = predict_proteins(input, project, redo, batch)
 	vog_out  = run_hmmer(protein_file, vogdb, ".vogout", cpus, redo)
 	pfam_out = run_hmmer(protein_file, pfam, ".pfamout", cpus, redo)
 
@@ -241,7 +246,10 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 
 	# now let's subset the genome to get only the prophage regions, and output that so we can look at it later if we want
 	subset = df2.ix[reg]
-	subset.to_csv(os.path.join(project, project+".prophage_annot.tsv"), sep='\t', index_label="protein_ids")
+	if batch:
+		subset.to_csv(project+".prophage_annot.tsv", sep='\t', index_label="protein_ids")
+	else:
+		subset.to_csv(os.path.join(project, project+".prophage_annot.tsv"), sep='\t', index_label="protein_ids")
 
 	# now let's get a summary of each prophage region, and output that
 	tally = 0
@@ -265,12 +273,20 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 			summary = summary.append(data)
 
 			# now let's output the proteins and nucleic acid sequence of the putative prophage
-			protein_file = os.path.join(project, project+"_prophage_region_"+str(tally)+".faa")
+			if batch:
+				protein_file = project+"_prophage_region_"+str(tally)+".faa"
+			else:
+				protein_file = os.path.join(project, project+"_prophage_region_"+str(tally)+".faa")
+
 			proteins = list(subset.index)
 			records = [record_dict[record] for record in record_dict.keys() if record in proteins]
 			SeqIO.write(records, protein_file, "fasta")
 
-			nucl_file = open(os.path.join(project, project+"_prophage_region_"+str(tally)+".fna"), "w")
+			if batch:
+				nucl_file = open(project+"_prophage_region_"+str(tally)+".fna", "w")
+			else:
+				nucl_file = open(os.path.join(project, project+"_prophage_region_"+str(tally)+".fna"), "w")
+
 			record = genome_dict[replicon]
 			seq = record.seq
 			
@@ -281,8 +297,13 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 	# if we find any prophage let's output a summary file
 	if summary.shape[1] > 0:
 		summary.columns = ['replicon', 'start_coord', 'end_coord', 'prophage_length', 'score', 'num_voghits', 'num_ORFs']
-		summary.to_csv(os.path.join(project, project+".summary.tsv"), sep="\t", index_label="prophage_regions")
-		df2.to_csv(os.path.join(project, project+".full_annot.tsv"), sep="\t", index_label="protein_ids")
+		
+		if batch:
+			summary.to_csv(project+".summary.tsv", sep="\t", index_label="prophage_regions")
+			df2.to_csv(project+".full_annot.tsv", sep="\t", index_label="protein_ids")		
+		else:
+			summary.to_csv(os.path.join(project, project+".summary.tsv"), sep="\t", index_label="prophage_regions")
+			df2.to_csv(os.path.join(project, project+".full_annot.tsv"), sep="\t", index_label="protein_ids")
 
 	#######################################################
 	################# Print figure ########################
@@ -306,7 +327,10 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 		plt.fill_between(df2["cumsum"], df2["rolling"])
 		plt.xticks(bounds, bound_labels)
 		plt.ylim(0, numpy.nanmax(df2["rolling"]))
-		f.savefig(os.path.join(project, project+".pdf"), bbox_inches='tight')
+		if batch:
+			f.savefig(project+".pdf", bbox_inches='tight')
+		else:
+			f.savefig(os.path.join(project, project+".pdf"), bbox_inches='tight')
 	#######################################################
 
 ########################################################################
@@ -323,7 +347,7 @@ def main(argv=None):
 	args_parser.add_argument('-v', '--minvog', required=False, default=int(4), help='minimum number of VOG hits that each prophage must have to be reported (default=4)')
 	args_parser.add_argument('-fl', '--flanking', required=False, default=int(0), help='length of flanking regions upstream and downstream of the prophage to output in the final .fna files (default=0)')
 	args_parser.add_argument('-t', '--cpus', required=False, default=1, help='number of cpus to use for the HMMER3 search')
-#	args_parser.add_argument('-b', '--batch', type=bool, default=False, const=True, nargs='?', help='Batch mode: implies the input is a folder of .fna files that each will be run iteratively')
+	args_parser.add_argument('-b', '--batch', type=bool, default=False, const=True, nargs='?', help='Batch mode: implies the input is a folder of .fna files that each will be run iteratively')
 	args_parser.add_argument('-r', '--redo', type=bool, default=False, const=True, nargs='?', help='run without re-launching prodigal and HMMER3 (for quickly re-calculating outputs with different parameters if you have already run once)')
 	args_parser.add_argument('-f', '--figplot', type=bool, default=False, const=True, nargs='?', help='Specify this flag if you would like a plot of the prophage-like regions with the output')
 	args_parser = args_parser.parse_args()
@@ -339,20 +363,24 @@ def main(argv=None):
 	plotflag = args_parser.figplot
 	redo = args_parser.redo
 	flanking = args_parser.flanking
-#	batch = args_parser.batch
+	batch = args_parser.batch
 
-#	if batch:
-#		os.mkdir(project)
-#		file_list = os.listdir(input)
-#		for i in file_list:
-#			if i.endswith(".fna"):
-#				name = re.sub(".fna", "", i)
-#				project = os.path.join(project, name)
-#				input = os.path.join(input, i)
-#				print(i, input, project, window, phagesize)
-#				run_program(input, project, window, phagesize, minscore, cpus, plotflag, redo, batch)
-#	else:
-	run_program(input, project, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking)
+	if batch:
+		if os.path.isdir(project):
+			pass
+		else:
+			os.mkdir(project)
+
+		file_list = os.listdir(input)
+		for i in file_list:
+			if i.endswith(".fna"):
+				name = re.sub(".fna", "", i)
+				project = os.path.join(project, name)
+				newinput = os.path.join(input, i)
+				print(i, newinput, project, window, phagesize)
+				run_program(newinput, project, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch)
+	else:
+		run_program(input, project, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch)
 
 	return 0
 
