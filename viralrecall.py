@@ -13,13 +13,15 @@ pfam = "hmm/pfam.reduced.hmm"
 
 # predict proteins from genome FNA file
 def predict_proteins(genome_file, project, redo, batch):
-	if batch:	
-		protein_file = project+".faa"
+	if batch:
+		file_name = os.path.basename(genome_file)
+		protein_file = os.path.join(project, re.sub('.fna', '.faa', file_name))
+		#protein_file = os.path.join(project, project+".faa")
 	else:
 		protein_file = os.path.join(project, re.sub('.fna', '.faa', genome_file))
 	
 	cmd = "prodigal -i "+ genome_file +" -a "+ protein_file
-	#print(cmd)
+	print(cmd)
 	cmd2 = shlex.split(cmd)
 	if not redo:
 		subprocess.call(cmd2, stdout=open("out.txt", "w"), stderr=open("err.txt", "w"))
@@ -101,7 +103,7 @@ def run_hmmer(input_file, db, suffix, cpus, redo):
 		cmd = "hmmsearch --cpu "+ cpus +" --cut_nc --tblout "+ output_file +" "+ db +" "+ input_file
 	else:
 		cmd = "hmmsearch --cpu "+ cpus +" -E 1e-10 --tblout "+ output_file +" "+ db +" "+ input_file	
-	#print(cmd)
+	print(cmd)
 	cmd2 = shlex.split(cmd)
 	if not redo:
 		subprocess.call(cmd2, stdout=open("out.txt", "w"), stderr=open("err.txt", "w"))
@@ -247,7 +249,8 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 	# now let's subset the genome to get only the prophage regions, and output that so we can look at it later if we want
 	subset = df2.ix[reg]
 	if batch:
-		subset.to_csv(project+".prophage_annot.tsv", sep='\t', index_label="protein_ids")
+		base = os.path.basename(project)
+		subset.to_csv(os.path.join(project, base+".prophage_annot.tsv"), sep='\t', index_label="protein_ids")
 	else:
 		subset.to_csv(os.path.join(project, project+".prophage_annot.tsv"), sep='\t', index_label="protein_ids")
 
@@ -274,7 +277,8 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 
 			# now let's output the proteins and nucleic acid sequence of the putative prophage
 			if batch:
-				protein_file = project+"_prophage_region_"+str(tally)+".faa"
+				base = os.path.basename(project)
+				protein_file = os.path.join(project, base+"_prophage_region_"+str(tally)+".faa")
 			else:
 				protein_file = os.path.join(project, project+"_prophage_region_"+str(tally)+".faa")
 
@@ -283,7 +287,8 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 			SeqIO.write(records, protein_file, "fasta")
 
 			if batch:
-				nucl_file = open(project+"_prophage_region_"+str(tally)+".fna", "w")
+				base = os.path.basename(project)
+				nucl_file = open(os.path.join(project, base+"_prophage_region_"+str(tally)+".fna"), "w")
 			else:
 				nucl_file = open(os.path.join(project, project+"_prophage_region_"+str(tally)+".fna"), "w")
 
@@ -299,8 +304,9 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 		summary.columns = ['replicon', 'start_coord', 'end_coord', 'prophage_length', 'score', 'num_voghits', 'num_ORFs']
 		
 		if batch:
-			summary.to_csv(project+".summary.tsv", sep="\t", index_label="prophage_regions")
-			df2.to_csv(project+".full_annot.tsv", sep="\t", index_label="protein_ids")		
+			base = os.path.basename(project)
+			summary.to_csv(os.path.join(project, base+".summary.tsv"), sep="\t", index_label="prophage_regions")
+			df2.to_csv(os.path.join(project, base+".full_annot.tsv"), sep="\t", index_label="protein_ids")		
 		else:
 			summary.to_csv(os.path.join(project, project+".summary.tsv"), sep="\t", index_label="prophage_regions")
 			df2.to_csv(os.path.join(project, project+".full_annot.tsv"), sep="\t", index_label="protein_ids")
@@ -375,10 +381,10 @@ def main(argv=None):
 		for i in file_list:
 			if i.endswith(".fna"):
 				name = re.sub(".fna", "", i)
-				project = os.path.join(project, name)
+				newproject = os.path.join(project, name)
 				newinput = os.path.join(input, i)
-				print(i, newinput, project, window, phagesize)
-				run_program(newinput, project, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch)
+				print(i, newinput, newproject)
+				run_program(newinput, newproject, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch)
 	else:
 		run_program(input, project, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch)
 
