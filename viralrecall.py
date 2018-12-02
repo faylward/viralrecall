@@ -18,7 +18,8 @@ def predict_proteins(genome_file, project, redo, batch):
 		protein_file = os.path.join(project, re.sub('.fna', '.faa', file_name))
 		#protein_file = os.path.join(project, project+".faa")
 	else:
-		protein_file = os.path.join(project, re.sub('.fna', '.faa', genome_file))
+		base_name = os.path.basename(genome_file)
+		protein_file = os.path.join(project, re.sub('.fna', '.faa', base_name))
 	
 	cmd = "prodigal -i "+ genome_file +" -a "+ protein_file
 	print(cmd)
@@ -169,7 +170,7 @@ def get_regions(list1):
 	return index_list
 
 # main function that runs the program
-def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch):
+def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch, summary_file):
 
 	# create output directories
 	if os.path.isdir(project):
@@ -305,12 +306,17 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 		
 		if batch:
 			base = os.path.basename(project)
+			summary_file.write(base +"\t"+ str(summary.shape[1]) +"\n")
 			summary.to_csv(os.path.join(project, base+".summary.tsv"), sep="\t", index_label="prophage_regions")
 			df2.to_csv(os.path.join(project, base+".full_annot.tsv"), sep="\t", index_label="protein_ids")		
 		else:
 			summary.to_csv(os.path.join(project, project+".summary.tsv"), sep="\t", index_label="prophage_regions")
 			df2.to_csv(os.path.join(project, project+".full_annot.tsv"), sep="\t", index_label="protein_ids")
 
+	else:
+		if batch:
+			base = os.path.basename(project)
+			summary_file.write(base +"\t0\n")
 	#######################################################
 	################# Print figure ########################
 	if (plotflag):
@@ -352,7 +358,7 @@ def main(argv=None):
 	args_parser.add_argument('-s', '--minscore', required=False, default=int(20), help='minimum score of prophage to report, with higher values indicating higher confidence (default=20)')
 	args_parser.add_argument('-v', '--minvog', required=False, default=int(4), help='minimum number of VOG hits that each prophage must have to be reported (default=4)')
 	args_parser.add_argument('-fl', '--flanking', required=False, default=int(0), help='length of flanking regions upstream and downstream of the prophage to output in the final .fna files (default=0)')
-	args_parser.add_argument('-t', '--cpus', required=False, default=1, help='number of cpus to use for the HMMER3 search')
+	args_parser.add_argument('-t', '--cpus', required=False, default=str(1), help='number of cpus to use for the HMMER3 search')
 	args_parser.add_argument('-b', '--batch', type=bool, default=False, const=True, nargs='?', help='Batch mode: implies the input is a folder of .fna files that each will be run iteratively')
 	args_parser.add_argument('-r', '--redo', type=bool, default=False, const=True, nargs='?', help='run without re-launching prodigal and HMMER3 (for quickly re-calculating outputs with different parameters if you have already run once)')
 	args_parser.add_argument('-f', '--figplot', type=bool, default=False, const=True, nargs='?', help='Specify this flag if you would like a plot of the prophage-like regions with the output')
@@ -372,11 +378,14 @@ def main(argv=None):
 	batch = args_parser.batch
 
 	if batch:
+		summary_file = open(os.path.join(project, "batch_summary.txt"), "w")
+		summary_file.write("genome\tnum_prophage\n")
+
 		if os.path.isdir(project):
 			pass
 		else:
 			os.mkdir(project)
-
+			
 		file_list = os.listdir(input)
 		for i in file_list:
 			if i.endswith(".fna"):
@@ -384,9 +393,10 @@ def main(argv=None):
 				newproject = os.path.join(project, name)
 				newinput = os.path.join(input, i)
 				print(i, newinput, newproject)
-				run_program(newinput, newproject, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch)
+				run_program(newinput, newproject, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch, summary_file)
 	else:
-		run_program(input, project, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch)
+		summary_file = 1
+		run_program(input, project, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch, summary_file)
 
 	return 0
 
