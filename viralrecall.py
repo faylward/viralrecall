@@ -6,9 +6,10 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from operator import itemgetter
 from itertools import islice
+import math
 
 # locations for the HMM database files to be used
-vogdb = "hmm/vogdb.hmm"
+vogdb = "hmm/vog.small.hmm"
 pfam = "hmm/pfam.reduced.hmm"
 
 # predict proteins from genome FNA file
@@ -101,9 +102,9 @@ def get_seqlist(input_file):
 def run_hmmer(input_file, db, suffix, cpus, redo):
 	output_file = re.sub(".faa", suffix, input_file)
 	if suffix == ".pfamout":
-		cmd = "hmmsearch --cpu "+ cpus +" --cut_nc --tblout "+ output_file +" "+ db +" "+ input_file
+		cmd = "hmmsearch --cut_nc --cpu "+ cpus +" --tblout "+ output_file +" "+ db +" "+ input_file
 	else:
-		cmd = "hmmsearch --cpu "+ cpus +" -E 1e-10 --tblout "+ output_file +" "+ db +" "+ input_file	
+		cmd = "hmmsearch -E 1e-10 --cpu "+ cpus +" --tblout "+ output_file +" "+ db +" "+ input_file	
 	print(cmd)
 	cmd2 = shlex.split(cmd)
 	if not redo:
@@ -226,7 +227,7 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 	for index, contig in enumerate(contigs):
 		# we need to calculate the rolling mean separately for each replicon so we don't get overlap between non-contiguous sequences
 		subset = pandas.DataFrame(df.loc[df['replicon'] == contig])
-		subset["rolling"] = subset["score"].rolling(window, min_periods=3).mean()
+		subset["rolling"] = subset["score"].rolling(window, min_periods=3, center=True).mean()
 		df2 = pandas.concat([df2, subset])
 
 		ends = subset["end"].tolist()
@@ -271,9 +272,13 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 		replicon = subset['replicon'].tolist()[0]
 
 		# Let's filter the putatige prophage by the parameters used in the input. 
-		if length >= phagesize and score > minscore and voghits > minvog:
+		if length >= phagesize and score > minscore and voghits >= minvog:
 			tally +=1
-			data = pandas.Series([replicon, minval, maxval, length, score, voghits, len(indices)], name="prophage_Region_"+str(tally))
+
+			record = genome_dict[replicon]
+			contig_length = len(record.seq)
+
+			data = pandas.Series([replicon, minval, maxval, length, contig_length, score, voghits, len(indices)], name="prophage_Region_"+str(tally))
 			summary = summary.append(data)
 
 			# now let's output the proteins and nucleic acid sequence of the putative prophage
@@ -302,7 +307,7 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 			
 	# if we find any prophage let's output a summary file
 	if summary.shape[1] > 0:
-		summary.columns = ['replicon', 'start_coord', 'end_coord', 'prophage_length', 'score', 'num_voghits', 'num_ORFs']
+		summary.columns = ['replicon', 'start_coord', 'end_coord', 'prophage_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs']
 		
 		if batch:
 			base = os.path.basename(project)
