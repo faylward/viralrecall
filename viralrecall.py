@@ -23,7 +23,7 @@ def predict_proteins(genome_file, project, redo, batch):
 		protein_file = os.path.join(project, re.sub('.fna', '.faa', base_name))
 	
 	cmd = "prodigal -i "+ genome_file +" -a "+ protein_file
-	print(cmd)
+	#print(cmd)
 	cmd2 = shlex.split(cmd)
 	if not redo:
 		subprocess.call(cmd2, stdout=open("out.txt", "w"), stderr=open("err.txt", "w"))
@@ -105,7 +105,7 @@ def run_hmmer(input_file, db, suffix, cpus, redo):
 		cmd = "hmmsearch --cut_nc --cpu "+ cpus +" --tblout "+ output_file +" "+ db +" "+ input_file
 	else:
 		cmd = "hmmsearch -E 1e-10 --cpu "+ cpus +" --tblout "+ output_file +" "+ db +" "+ input_file	
-	print(cmd)
+	#print(cmd)
 	cmd2 = shlex.split(cmd)
 	if not redo:
 		subprocess.call(cmd2, stdout=open("out.txt", "w"), stderr=open("err.txt", "w"))
@@ -130,7 +130,7 @@ def parse_hmmout(hmmout):
 			score = float(tabs[5])
 			if score > bit_dict[protein]:
 				if hit == "VOG02293" or hit == "VOG04678" or hit == "VOG01352" or hit == "VOG09752":
-					print(protein, hit, score)
+					#print(protein, hit, score)
 					pass
 					#hit = ""
 					#bit = float(0)
@@ -159,15 +159,20 @@ def cumsum2(list1):
 	return cumsum
 
 # get genomic regions that look like phage
-def get_regions(list1):
+def get_regions(list1, list2):
 	index_list = []
 	for index,value in enumerate(list1):
 		if index == 0:
 			pass
 		elif value == 0:
 			pass
-		elif value > 0 and list1[index-1] > 0:
-			index_list.append(index-1)
+		elif value > 0 and list1[index-1] > 0 and list2[index] == list2[index-1]:
+			newval = index-1
+			if newval in index_list:
+				pass
+			else:
+				index_list.append(index-1)
+			index_list.append(index)
 	return index_list
 
 # main function that runs the program
@@ -211,6 +216,7 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 	# fill all NA values with 0, ensuring that proteins with no hit to either Pfam or VOG are counted as having a bit score of 0. The "prophage score" is then calculated as the difference between the Pfam and VOG scores.
 	df.fillna(float(0), inplace=True, axis=1)
 	df["start"] = pandas.to_numeric(df['start'])
+	df["end"] = pandas.to_numeric(df['end'])
 	df = df.sort_values(by=['replicon', 'start'])
 	df["score"] = df["vogbit"] - df["pfambit"]
 
@@ -245,9 +251,12 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 	df2.fillna(0, inplace=True, axis=1)
 
 	# now let's get the regions of the entire genome file that have a net positive prophage signal
-	reg = get_regions(df2["rolling"].tolist())
+	reg = get_regions(df2["rolling"].tolist(), df["replicon"].tolist())
+	#print(reg)
+	replicons = df["replicon"].tolist()
 	reg = [int(i) for i in reg]
-
+	#print(reg)
+	
 	# now let's subset the genome to get only the prophage regions, and output that so we can look at it later if we want
 	subset = df2.ix[reg]
 	if batch:
@@ -264,15 +273,20 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 		#if len(indices) >= phagesize:
 		subset = df.ix[indices]
 		minval = min(subset["start"])
-		maxval = max(subset["start"])
+		maxval = max(subset["end"])
+		#print(minval, maxval)
+		#print(key, map(itemgetter(1), group), group, indices, [replicons[k] for k in indices])
+		#print([replicons[k] for k in indices])
 		
 		score = numpy.mean(subset["score"])
 		voghits = len([i for i in subset["vogbit"].tolist() if i > 0])
-		length = int(maxval - minval)
+		length = int(float(maxval) - float(minval))
 		replicon = subset['replicon'].tolist()[0]
-
+		#print(minval, maxval, replicon, score, length)
+		
 		# Let's filter the putatige prophage by the parameters used in the input. 
 		if length >= phagesize and score > minscore and voghits >= minvog:
+			#print(minval, maxval, replicon, score, length)
 			tally +=1
 
 			record = genome_dict[replicon]
