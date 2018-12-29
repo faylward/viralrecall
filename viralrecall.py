@@ -9,7 +9,7 @@ from itertools import islice
 import math
 
 # locations for the HMM database files to be used
-vogdb = "hmm/vog.small.hmm"
+vogdb = "hmm/vog.large.hmm"
 pfam = "hmm/pfam.reduced.hmm"
 
 # predict proteins from genome FNA file
@@ -325,7 +325,7 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 		
 		if batch:
 			base = os.path.basename(project)
-			summary_file.write(base +"\t"+ str(summary.shape[1]) +"\n")
+			summary_file.write(base +"\t"+ str(summary.shape[0]) +"\n")
 			summary.to_csv(os.path.join(project, base+".summary.tsv"), sep="\t", index_label="prophage_regions")
 			df2.to_csv(os.path.join(project, base+".full_annot.tsv"), sep="\t", index_label="protein_ids")		
 		else:
@@ -397,6 +397,11 @@ def main(argv=None):
 	batch = args_parser.batch
 
 	if batch:
+		if os.path.isdir(project):
+			pass
+		else:
+			os.mkdir(project)
+		
 		summary_file = open(os.path.join(project, "batch_summary.txt"), "w")
 		summary_file.write("genome\tnum_prophage\n")
 
