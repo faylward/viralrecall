@@ -8,3 +8,5 @@ Work in progress...
 ## Instructions
 
 ## Examples
+
+## Citation
