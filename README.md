@@ -44,16 +44,16 @@ Additionally, for each viral region viralrecall will print out .faa and .fna fil
 
 There are several parameters you can change in viralrecall depending on your preferences and the data you're analyzing. The important parameters that will influence the results are:
 
--s, --minscore
+**-s, --minscore**
 This is the mean score that a genomic regions needs to have in order to pass the filter and get reported as a viral region. The score is calculated from the HMMER3 scores, with higher scores indicating more and better matches to the VOG database, and lower scores indicating more and higher matches to the Pfam database. The default is 10. 
 
--w, --window
+**-w, --window**
 Size of the sliding window to use for calculating moving averages. A smaller window may help predict short viral regions, but may split large viral regions into several pieces. 
 
--m, --minsize
+**-m, --minsize**
 Minimum size, in kilobases, of the viral regions to report. 
 
--v, --minvog
+**-v, --minvog**
 Minimum number of hits against the VOG database that must be recorded in a region in order for it to be reported (larger values == higher confidence). 
 
 For example, if we wanted to recover only long, well-defined viral regions we could use the following command:
