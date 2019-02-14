@@ -2,7 +2,7 @@
 ViralRecall is a flexible command-line tool for predicting prophage and other virus-like regions in genomic data.
 
 ### Dependencies
-ViralRecall is written in Python 3.5.2 and requires numpy, pandas, and biopython. Additionally, matplotlib is required if you wish to use the plotting option. 
+ViralRecall is written in Python 3.5.2 and requires biopython, matplotlib, numpy, and pandas. 
 ViralRecall uses Prodigal and HMMER3 for protein prediction and HMM searches, respectively. Please ensure these tools are installed in your PATH before using. 
 One a Unix system you should be able to install these tools with: 
 > sudo apt install prodigal
@@ -79,7 +79,7 @@ All of the output files should have their own folder in the folderout directory.
 
 ## Citation
 
-Citation for this tool is pending. If you plan on using this tool in an article please email Frank Aylward to ask the best way to cite this work <faylward _at_ vt dot edu>
+Citation for this tool is pending. If you plan on using this tool in an article please email Frank Aylward to ask the best way to cite this work at faylward _at_ vt dot edu
 
 Also, since this tool requires Prodigal and HMMER3, please cite thest tools as well. Their citations are:
 
