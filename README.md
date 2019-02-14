@@ -2,7 +2,7 @@
 ViralRecall is a flexible command-line tool for predicting prophage and other virus-like regions in genomic data.
 
 ### Dependencies
-ViralRecall is written in Python 3.5.2 and requires biopython, matplotlib, numpy, and pandas. 
+ViralRecall is written in Python 3.5.6 and requires biopython, matplotlib, numpy, and pandas. 
 ViralRecall uses Prodigal and HMMER3 for protein prediction and HMM searches, respectively. Please ensure these tools are installed in your PATH before using. 
 One a Unix system you should be able to install these tools with: 
 > sudo apt install prodigal
@@ -60,6 +60,7 @@ For example, if we wanted to recover only long, well-defined viral regions we co
 > python viralrecall.py -i examples/test_seq.fna -p testout -s 15 -m 30 -v 10
 
 Here we are asking for only regions that have a mean score >= 15, are at least 30 kilobases long, and have at least 10 VOG hits.
+
 If we want to quickly re-do the above analysis with different parameters, but without re-doing gene predictions and HMMER3 searches, we can use the -r flag:
 
 > python viralrecall.py -i examples/test_seq.fna -p testout -s 15 -m 30 -v 10 -r
