@@ -1,15 +1,13 @@
 import sys, os, re, shlex, subprocess, pandas, numpy, itertools, argparse, time
 from collections import defaultdict
 from Bio import SeqIO
+from operator import itemgetter
+from itertools import islice
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from operator import itemgetter
-from itertools import islice
 import math
 
-# locations for the HMM database files to be used
-vogdb = "hmm/vog.large.hmm"
 pfam = "hmm/pfam.reduced.hmm"
 
 # predict proteins from genome FNA file
@@ -104,7 +102,14 @@ def run_hmmer(input_file, db, suffix, cpus, redo):
 	if suffix == ".pfamout":
 		cmd = "hmmsearch --cut_nc --cpu "+ cpus +" --tblout "+ output_file +" "+ db +" "+ input_file
 	else:
-		cmd = "hmmsearch -E 1e-10 --cpu "+ cpus +" --tblout "+ output_file +" "+ db +" "+ input_file	
+		if db == "large":
+			vogdb = "hmm/vog.large.hmm"
+		elif db == "small":
+			vogdb = "hmm/vog.large.hmm"
+		elif db == "all":
+			vogdb = "hmm/vogdb.hmm"
+
+		cmd = "hmmsearch -E 1e-10 --cpu "+ cpus +" --tblout "+ output_file +" "+ vogdb +" "+ input_file	
 	#print(cmd)
 	cmd2 = shlex.split(cmd)
 	if not redo:
@@ -127,7 +132,7 @@ def parse_hmmout(hmmout):
 			protein = tabs[0]
 			hit = tabs[2]
 			eval = float(tabs[4])
-			score = float(tabs[5])
+			score = math.sqrt(float(tabs[5])) * 10
 			if score > bit_dict[protein]:
 				if hit == "VOG02293" or hit == "VOG04678" or hit == "VOG01352" or hit == "VOG09752":
 					#print(protein, hit, score)
@@ -164,9 +169,9 @@ def get_regions(list1, list2):
 	for index,value in enumerate(list1):
 		if index == 0:
 			pass
-		elif value == 0:
-			pass
-		elif value > 0 and list1[index-1] > 0 and list2[index] == list2[index-1]:
+		#elif value == 0:
+		#	pass
+		elif value >= 0 and list1[index-1] >= 0 and list2[index] == list2[index-1]:
 			newval = index-1
 			if newval in index_list:
 				pass
@@ -176,7 +181,7 @@ def get_regions(list1, list2):
 	return index_list
 
 # main function that runs the program
-def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch, summary_file):
+def run_program(input, project, database, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch, summary_file):
 
 	# create output directories
 	if os.path.isdir(project):
@@ -187,9 +192,15 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 	else:
 		os.mkdir(project)
 
+	# remove previous files before re-calculating results
+	if redo:
+		for files in os.listdir(project):
+			if files.endswith(".tsv") or "_viral_region_" in files:
+				os.remove(os.path.join(project, files))
+
 	# predict proteins, run HMMER3 searches, and parse outputs
 	protein_file = predict_proteins(input, project, redo, batch)
-	vog_out  = run_hmmer(protein_file, vogdb, ".vogout", cpus, redo)
+	vog_out  = run_hmmer(protein_file, database, ".vogout", cpus, redo)
 	pfam_out = run_hmmer(protein_file, pfam, ".pfamout", cpus, redo)
 
 	vog_hit, vog_bit = parse_hmmout(vog_out)
@@ -261,9 +272,9 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 	subset = df2.ix[reg]
 	if batch:
 		base = os.path.basename(project)
-		subset.to_csv(os.path.join(project, base+".prophage_annot.tsv"), sep='\t', index_label="protein_ids")
+		subset.to_csv(os.path.join(project, base+".vregion_annot.tsv"), sep='\t', index_label="protein_ids")
 	else:
-		subset.to_csv(os.path.join(project, project+".prophage_annot.tsv"), sep='\t', index_label="protein_ids")
+		subset.to_csv(os.path.join(project, project+".vregion_annot.tsv"), sep='\t', index_label="protein_ids")
 
 	# now let's get a summary of each prophage region, and output that
 	tally = 0
@@ -292,15 +303,15 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 			record = genome_dict[replicon]
 			contig_length = len(record.seq)
 
-			data = pandas.Series([replicon, minval, maxval, length, contig_length, score, voghits, len(indices)], name="prophage_Region_"+str(tally))
+			data = pandas.Series([replicon, minval, maxval, length, contig_length, score, voghits, len(indices)], name="viral_egion_"+str(tally))
 			summary = summary.append(data)
 
 			# now let's output the proteins and nucleic acid sequence of the putative prophage
 			if batch:
 				base = os.path.basename(project)
-				protein_file = os.path.join(project, base+"_prophage_region_"+str(tally)+".faa")
+				protein_file = os.path.join(project, base+"_viral_region_"+str(tally)+".faa")
 			else:
-				protein_file = os.path.join(project, project+"_prophage_region_"+str(tally)+".faa")
+				protein_file = os.path.join(project, project+"_viral_region_"+str(tally)+".faa")
 
 			proteins = list(subset.index)
 			records = [record_dict[record] for record in record_dict.keys() if record in proteins]
@@ -308,34 +319,40 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 
 			if batch:
 				base = os.path.basename(project)
-				nucl_file = open(os.path.join(project, base+"_prophage_region_"+str(tally)+".fna"), "w")
+				nucl_file = open(os.path.join(project, base+"_viral_region_"+str(tally)+".fna"), "w")
 			else:
-				nucl_file = open(os.path.join(project, project+"_prophage_region_"+str(tally)+".fna"), "w")
+				nucl_file = open(os.path.join(project, project+"_viral_region_"+str(tally)+".fna"), "w")
 
 			record = genome_dict[replicon]
 			seq = record.seq
 			
 			newcoords = get_finalcoords((0, len(record.seq)), (minval, maxval), flanking)
 			prophage_region = seq[newcoords[0]:newcoords[1]]
-			nucl_file.write(">"+ project+"_prophage_region_"+str(tally) +" "+ record.id +"\n"+ str(prophage_region))
+			nucl_file.write(">"+ project+"_viral_region_"+str(tally) +" "+ record.id +"\n"+ str(prophage_region))
 			
 	# if we find any prophage let's output a summary file
-	if summary.shape[1] > 0:
-		summary.columns = ['replicon', 'start_coord', 'end_coord', 'prophage_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs']
-		
-		if batch:
+
+	if batch:
+		df2.to_csv(os.path.join(project, base+".full_annot.tsv"), sep="\t", index_label="protein_ids")
+
+		if summary.shape[1] > 0:
+
+			summary.columns = ['replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs']
 			base = os.path.basename(project)
 			summary_file.write(base +"\t"+ str(summary.shape[0]) +"\n")
-			summary.to_csv(os.path.join(project, base+".summary.tsv"), sep="\t", index_label="prophage_regions")
-			df2.to_csv(os.path.join(project, base+".full_annot.tsv"), sep="\t", index_label="protein_ids")		
-		else:
-			summary.to_csv(os.path.join(project, project+".summary.tsv"), sep="\t", index_label="prophage_regions")
-			df2.to_csv(os.path.join(project, project+".full_annot.tsv"), sep="\t", index_label="protein_ids")
+			summary.to_csv(os.path.join(project, base+".summary.tsv"), sep="\t", index_label="viral_regions")
 
-	else:
-		if batch:
+		else:
 			base = os.path.basename(project)
 			summary_file.write(base +"\t0\n")
+
+	else:
+		if summary.shape[1] > 0:
+			summary.columns = ['replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs']
+			summary.to_csv(os.path.join(project, project+".summary.tsv"), sep="\t", index_label="viral_regions")
+			df2.to_csv(os.path.join(project, project+".full_annot.tsv"), sep="\t", index_label="protein_ids")
+
+
 	#######################################################
 	################# Print figure ########################
 	if (plotflag):
@@ -369,23 +386,25 @@ def run_program(input, project, window, phagesize, minscore, minvog, cpus, plotf
 ########################################################################
 def main(argv=None):
 
-	args_parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description="ViralRecall: Predicting prophage-like regions in prokaryotic genomes \nFrank O. Aylward, Assistant Professor, Virginia Tech Department of Biological Sciences <faylward at vt dot edu>", epilog='*******************************************************************\nIf you use this tool in a publication please do not forget to cite:\nProdigal (DOI 10.1186/1471-2105-11-119)\nHMMER3 (DOI 10.1371/journal.pcbi.1002195)\n*******************************************************************')
+	args_parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description="ViralRecall: A flexible command-line tool for predicting prophage and other virus-like regions in genomic data \nFrank O. Aylward, Assistant Professor, Virginia Tech Department of Biological Sciences <faylward at vt dot edu>", epilog='*******************************************************************\nIf you use this tool in a publication please do not forget to cite:\nProdigal (DOI 10.1186/1471-2105-11-119)\nHMMER3 (DOI 10.1371/journal.pcbi.1002195)\n*******************************************************************')
 	args_parser.add_argument('-i', '--input', required=True, help='Input FASTA file (ending in .fna)')
 	args_parser.add_argument('-p', '--project', required=True, help='project name for outputs')
-	args_parser.add_argument('-w', '--window', required=False, default=int(15), help='sliding window size to use for detecting prophage regions (default=15)')
-	args_parser.add_argument('-m', '--minsize', required=False, default=int(10), help='minimum length of prophage to report, in kilobases (default=10)')
-	args_parser.add_argument('-s', '--minscore', required=False, default=int(20), help='minimum score of prophage to report, with higher values indicating higher confidence (default=20)')
-	args_parser.add_argument('-v', '--minvog', required=False, default=int(4), help='minimum number of VOG hits that each prophage must have to be reported (default=4)')
-	args_parser.add_argument('-fl', '--flanking', required=False, default=int(0), help='length of flanking regions upstream and downstream of the prophage to output in the final .fna files (default=0)')
+	args_parser.add_argument('-db', '--database', required=False, default="all", help='VOG database to use. Options are "all", "large", or "small". See README for details')
+	args_parser.add_argument('-w', '--window', required=False, default=int(15), help='sliding window size to use for detecting viral regions (default=15)')
+	args_parser.add_argument('-m', '--minsize', required=False, default=int(10), help='minimum length of viral regions to report, in kilobases (default=10)')
+	args_parser.add_argument('-s', '--minscore', required=False, default=int(10), help='minimum score of viral regions to report, with higher values indicating higher confidence (default=10)')
+	args_parser.add_argument('-v', '--minvog', required=False, default=int(4), help='minimum number of VOG hits that each viral region must have to be reported (default=4)')
+	args_parser.add_argument('-fl', '--flanking', required=False, default=int(0), help='length of flanking regions upstream and downstream of the viral region to output in the final .fna files (default=0)')
 	args_parser.add_argument('-t', '--cpus', required=False, default=str(1), help='number of cpus to use for the HMMER3 search')
 	args_parser.add_argument('-b', '--batch', type=bool, default=False, const=True, nargs='?', help='Batch mode: implies the input is a folder of .fna files that each will be run iteratively')
 	args_parser.add_argument('-r', '--redo', type=bool, default=False, const=True, nargs='?', help='run without re-launching prodigal and HMMER3 (for quickly re-calculating outputs with different parameters if you have already run once)')
-	args_parser.add_argument('-f', '--figplot', type=bool, default=False, const=True, nargs='?', help='Specify this flag if you would like a plot of the prophage-like regions with the output')
+	args_parser.add_argument('-f', '--figplot', type=bool, default=False, const=True, nargs='?', help='Specify this flag if you would like a plot of the viral-like regions with the output')
 	args_parser = args_parser.parse_args()
 
 	# set up object names for input/output/database folders
 	input = args_parser.input
 	project = args_parser.project
+	database = args_parser.database
 	window = int(args_parser.window)
 	phagesize = int(args_parser.minsize)*1000
 	minscore = int(args_parser.minscore)
@@ -416,11 +435,11 @@ def main(argv=None):
 				name = re.sub(".fna", "", i)
 				newproject = os.path.join(project, name)
 				newinput = os.path.join(input, i)
-				print(i, newinput, newproject)
-				run_program(newinput, newproject, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch, summary_file)
+				print("Running viralrecall on "+ i + " and output will be deposited in "+ newproject)
+				run_program(newinput, newproject, database, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch, summary_file)
 	else:
 		summary_file = 1
-		run_program(input, project, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch, summary_file)
+		run_program(input, project, database, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch, summary_file)
 
 	return 0
 
