@@ -43,11 +43,17 @@ Results should be located in the test_outdir folder.
 The output files contain:
 
 *.faa:                   The proteins predicted from the input file using Prodigal
+
 *.full_annot.tsv:        A full annotation table of the predicted ORFs. 
+
 *.prophage.annot.tsv:    An annotation of only the viral regions (only present if some viral regions found)
+
 *summary.tsv             Summary statistics for the predicted viral regions. 
+
 *.pfamout                Raw output of the Pfam HMMER3 search
+
 *.vogout                 Raw output of the VOGDB HMMER3 search
+
 
 Additionally, for each viral region viralrecall will print out .faa and .fna files for the proteins and nucleotide sequences for the regions found. 
 
