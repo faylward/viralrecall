@@ -365,7 +365,7 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, c
 		bounds = [item*1000000 for item in bound_labels]
 
 		val = numpy.nanmax(df2["rolling"])/10
-		print(contig_bounds, val)
+		#print(contig_bounds, val)
 		plt.vlines(contig_bounds, 0, val, colors="red", zorder=20)
 		plt.plot(df2["cumsum"], df2["rolling"])
 		plt.xticks([])
