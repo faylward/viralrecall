@@ -30,6 +30,9 @@ Viralrecall uses two main HMM databases to analyze viral signatures in genomic d
 
 The database files are available for download from the Virginia Tech library system. To download and unpack, navigate to the folder that contains the viralrecall.py script and type:
 > wget -O hmm.tar.gz https://data.lib.vt.edu/downloads/8k71nh28c
+
+and then
+
 > tar -xvzf hmm.tar.gz
 
 ### Basic Usage
