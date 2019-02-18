@@ -41,6 +41,7 @@ To test if ViralRecall will run properly type:
 
 Results should be located in the test_outdir folder. 
 The output files contain:
+
 *.faa:                   The proteins predicted from the input file using Prodigal
 *.full_annot.tsv:        A full annotation table of the predicted ORFs. 
 *.prophage.annot.tsv:    An annotation of only the viral regions (only present if some viral regions found)
