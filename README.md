@@ -29,8 +29,8 @@ ViralRecall was tested on Ubuntu 16.04 and should work on most Unix-based system
 Viralrecall uses two main HMM databases to analyze viral signatures in genomic data. The first is Pfam, which is a broad-specificity database that detects many protein families that are common in the genomes of cellular organisms. The Pfam database here has been modified to remove common viral protein families. The second HMM database is VOGDB, which is a comprehensive database of known viral protein families. The full VOG HMM database is quite large, and in some situations users may wish to use smaller sets to speed up runtime. We have created three VOG database that vary in size (all, large, and small). Users wishing to perform an exhaustive search should use the "all" database, while those preferring a faster search may wish to use the "small" database (the "large" database is an intermediate size option). 
 
 The database files are available for download from the Virginia Tech library system. To download and unpack, navigate to the folder that contains the viralrecall.py script and type:
-> wget XXX
-> tar -xvfz XXX
+> wget -O hmm.tar.gz https://data.lib.vt.edu/downloads/8k71nh28c
+> tar -xvzf hmm.tar.gz
 
 ### Basic Usage
 To test if ViralRecall will run properly type:
