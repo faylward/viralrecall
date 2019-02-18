@@ -40,7 +40,7 @@ To test if ViralRecall will run properly type:
 > python viralrecall.py -i examples/test_seq.fna -p test_outdir -t 2 -db small -f
 
 Results should be located in the test_outdir folder. 
-The output files contain:
+The output folder will contain:
 
 *.faa:                   The proteins predicted from the input file using Prodigal
 
@@ -56,6 +56,7 @@ The output files contain:
 
 
 Additionally, for each viral region viralrecall will print out .faa and .fna files for the proteins and nucleotide sequences for the regions found. 
+Please be sure to use only .fna files as input. 
 
 
 ### Options
