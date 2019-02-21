@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys, os, re, shlex, subprocess, pandas, numpy, itertools, argparse, time
 from collections import defaultdict
 from Bio import SeqIO
@@ -164,14 +165,14 @@ def cumsum2(list1):
 	return cumsum
 
 # get genomic regions that look like phage
-def get_regions(list1, list2):
+def get_regions(list1):
 	index_list = []
 	for index,value in enumerate(list1):
 		if index == 0:
 			pass
 		#elif value == 0:
 		#	pass
-		elif value >= 0 and list1[index-1] >= 0 and list2[index] == list2[index-1]:
+		elif value >= 0 and list1[index-1] >= 0:
 			newval = index-1
 			if newval in index_list:
 				pass
@@ -261,74 +262,82 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, c
 	df2 = df2.sort_values(by=["cumsum"])
 	df2.fillna(0, inplace=True, axis=1)
 
-	# now let's get the regions of the entire genome file that have a net positive prophage signal
-	reg = get_regions(df2["rolling"].tolist(), df["replicon"].tolist())
-	#print(reg)
-	replicons = df["replicon"].tolist()
-	reg = [int(i) for i in reg]
-	#print(reg)
-	
-	# now let's subset the genome to get only the prophage regions, and output that so we can look at it later if we want
-	subset = df2.ix[reg]
-	if batch:
-		base = os.path.basename(project)
-		subset.to_csv(os.path.join(project, base+".vregion_annot.tsv"), sep='\t', index_label="protein_ids")
-	else:
-		subset.to_csv(os.path.join(project, project+".vregion_annot.tsv"), sep='\t', index_label="protein_ids")
+	reps = set(df2["replicon"].tolist())
 
-	# now let's get a summary of each prophage region, and output that
-	tally = 0
+	# initialize summary dataframe that we will append to as we find viral regions
 	summary = pandas.DataFrame()
-	for key, group in itertools.groupby(enumerate(reg), key=lambda ix:ix[0]-ix[1]):
-		indices = list(map(itemgetter(1), group))
-		#if len(indices) >= phagesize:
-		subset = df.ix[indices]
-		minval = min(subset["start"])
-		maxval = max(subset["end"])
-		#print(minval, maxval)
-		#print(key, map(itemgetter(1), group), group, indices, [replicons[k] for k in indices])
-		#print([replicons[k] for k in indices])
+	tally = 0
+
+	for rep in reps:
+
+		df3 = df2.loc[df2['replicon'] == rep]
+
+		print(rep, df3.shape)
+		# now let's get the regions of the entire genome file that have a net positive prophage signal
+		reg = get_regions(df3["rolling"].tolist())
+		reg = [int(i) for i in reg]
+
+		# now let's subset the genome to get only the prophage regions, and output that so we can look at it later if we want
+		subset = df3.ix[reg]
+		if batch:
+			base = os.path.basename(project)
+			subset.to_csv(os.path.join(project, base+".vregion_annot.tsv"), sep='\t', index_label="protein_ids")
+		else:
+			subset.to_csv(os.path.join(project, project+".vregion_annot.tsv"), sep='\t', index_label="protein_ids")
+
+
+
+		# now let's get a summary of each prophage region, and output that
+		for key, group in itertools.groupby(enumerate(reg), key=lambda ix:ix[0]-ix[1]):
+			indices = list(map(itemgetter(1), group))
+			subset = df3.ix[indices]
+			minval = min(subset["start"])
+			maxval = max(subset["end"])
+			#print(minval, maxval)
+			#print(key, map(itemgetter(1), group), group, indices, [replicons[k] for k in indices])
+			#print([replicons[k] for k in indices])
 		
-		score = numpy.mean(subset["score"])
-		voghits = len([i for i in subset["vogbit"].tolist() if i > 0])
-		length = int(float(maxval) - float(minval))
-		replicon = subset['replicon'].tolist()[0]
-		#print(minval, maxval, replicon, score, length)
-		
-		# Let's filter the putatige prophage by the parameters used in the input. 
-		if length >= phagesize and score > minscore and voghits >= minvog:
+			score = numpy.mean(subset["score"])
+			voghits = len([i for i in subset["vogbit"].tolist() if i > 0])
+			length = int(float(maxval) - float(minval))
+			replicon = subset['replicon'].tolist()[0]
 			#print(minval, maxval, replicon, score, length)
-			tally +=1
+		
+			# Let's filter the putatige prophage by the parameters used in the input. 
+			if length >= phagesize and score > minscore and voghits >= minvog:
+				#print(minval, maxval, replicon, score, length)
+				tally +=1
 
-			record = genome_dict[replicon]
-			contig_length = len(record.seq)
+				record = genome_dict[replicon]
+				contig_length = len(record.seq)
 
-			data = pandas.Series([replicon, minval, maxval, length, contig_length, score, voghits, len(indices)], name="viral_egion_"+str(tally))
-			summary = summary.append(data)
+				data = pandas.Series([replicon, minval, maxval, length, contig_length, score, voghits, len(indices)], name="viral_region_"+str(tally))
+				summary = summary.append(data)
+				print(summary)
 
-			# now let's output the proteins and nucleic acid sequence of the putative prophage
-			if batch:
-				base = os.path.basename(project)
-				protein_file = os.path.join(project, base+"_viral_region_"+str(tally)+".faa")
-			else:
-				protein_file = os.path.join(project, project+"_viral_region_"+str(tally)+".faa")
+				# now let's output the proteins and nucleic acid sequence of the putative prophage
+				if batch:
+					base = os.path.basename(project)
+					protein_file = os.path.join(project, base+"_viral_region_"+str(tally)+".faa")
+				else:
+					protein_file = os.path.join(project, project+"_viral_region_"+str(tally)+".faa")
 
-			proteins = list(subset.index)
-			records = [record_dict[record] for record in record_dict.keys() if record in proteins]
-			SeqIO.write(records, protein_file, "fasta")
+				proteins = list(subset.index)
+				records = [record_dict[record] for record in record_dict.keys() if record in proteins]
+				SeqIO.write(records, protein_file, "fasta")
 
-			if batch:
-				base = os.path.basename(project)
-				nucl_file = open(os.path.join(project, base+"_viral_region_"+str(tally)+".fna"), "w")
-			else:
-				nucl_file = open(os.path.join(project, project+"_viral_region_"+str(tally)+".fna"), "w")
+				if batch:
+					base = os.path.basename(project)
+					nucl_file = open(os.path.join(project, base+"_viral_region_"+str(tally)+".fna"), "w")
+				else:
+					nucl_file = open(os.path.join(project, project+"_viral_region_"+str(tally)+".fna"), "w")
 
-			record = genome_dict[replicon]
-			seq = record.seq
+				record = genome_dict[replicon]
+				seq = record.seq
 			
-			newcoords = get_finalcoords((0, len(record.seq)), (minval, maxval), flanking)
-			prophage_region = seq[newcoords[0]:newcoords[1]]
-			nucl_file.write(">"+ project+"_viral_region_"+str(tally) +" "+ record.id +"\n"+ str(prophage_region))
+				newcoords = get_finalcoords((0, len(record.seq)), (minval, maxval), flanking)
+				prophage_region = seq[newcoords[0]:newcoords[1]]
+				nucl_file.write(">"+ project+"_viral_region_"+str(tally) +" "+ record.id +"\n"+ str(prophage_region))
 			
 	# if we find any prophage let's output a summary file
 
