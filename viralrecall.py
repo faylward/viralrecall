@@ -272,7 +272,7 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, c
 
 		df3 = df2.loc[df2['replicon'] == rep]
 
-		print(rep, df3.shape)
+		#print(rep, df3.shape)
 		# now let's get the regions of the entire genome file that have a net positive prophage signal
 		reg = get_regions(df3["rolling"].tolist())
 		reg = [int(i) for i in reg]
@@ -313,7 +313,7 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, c
 
 				data = pandas.Series([replicon, minval, maxval, length, contig_length, score, voghits, len(indices)], name="viral_region_"+str(tally))
 				summary = summary.append(data)
-				print(summary)
+				#print(summary)
 
 				# now let's output the proteins and nucleic acid sequence of the putative prophage
 				if batch:
