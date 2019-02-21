@@ -98,7 +98,7 @@ def get_seqlist(input_file):
 	return seqlist, strandlist, prot2start, prot2end, prot2contig, record_dict
 		
 # run HMMER3
-def run_hmmer(input_file, db, suffix, cpus, redo):
+def run_hmmer(input_file, db, suffix, cpus, redo, evalue):
 	output_file = re.sub(".faa", suffix, input_file)
 	if suffix == ".pfamout":
 		cmd = "hmmsearch --cut_nc --cpu "+ cpus +" --tblout "+ output_file +" "+ db +" "+ input_file
@@ -110,9 +110,10 @@ def run_hmmer(input_file, db, suffix, cpus, redo):
 		elif db == "all":
 			vogdb = "hmm/vogdb.hmm"
 
-		cmd = "hmmsearch -E 1e-10 --cpu "+ cpus +" --tblout "+ output_file +" "+ vogdb +" "+ input_file	
-	#print(cmd)
+		cmd = "hmmsearch -E "+ str(evalue) +" --cpu "+ cpus +" --tblout "+ output_file +" "+ vogdb +" "+ input_file	
+		#print(evalue, cmd)
 	cmd2 = shlex.split(cmd)
+
 	if not redo:
 		subprocess.call(cmd2, stdout=open("out.txt", "w"), stderr=open("err.txt", "w"))
 	return output_file
@@ -182,7 +183,7 @@ def get_regions(list1):
 	return index_list
 
 # main function that runs the program
-def run_program(input, project, database, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch, summary_file):
+def run_program(input, project, database, window, phagesize, minscore, minvog, evalue, cpus, plotflag, redo, flanking, batch, summary_file):
 
 	# create output directories
 	if os.path.isdir(project):
@@ -201,8 +202,8 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, c
 
 	# predict proteins, run HMMER3 searches, and parse outputs
 	protein_file = predict_proteins(input, project, redo, batch)
-	vog_out  = run_hmmer(protein_file, database, ".vogout", cpus, redo)
-	pfam_out = run_hmmer(protein_file, pfam, ".pfamout", cpus, redo)
+	vog_out  = run_hmmer(protein_file, database, ".vogout", cpus, redo, evalue)
+	pfam_out = run_hmmer(protein_file, pfam, ".pfamout", cpus, redo, evalue)
 
 	vog_hit, vog_bit = parse_hmmout(vog_out)
 	pfam_hit, pfam_bit = parse_hmmout(pfam_out)
@@ -403,6 +404,7 @@ def main(argv=None):
 	args_parser.add_argument('-m', '--minsize', required=False, default=int(10), help='minimum length of viral regions to report, in kilobases (default=10)')
 	args_parser.add_argument('-s', '--minscore', required=False, default=int(10), help='minimum score of viral regions to report, with higher values indicating higher confidence (default=10)')
 	args_parser.add_argument('-v', '--minvog', required=False, default=int(4), help='minimum number of VOG hits that each viral region must have to be reported (default=4)')
+	args_parser.add_argument('-e', '--evalue', required=False, default=str(1e-10), help='e-value that is passed to HMMER3 for the VOG hmmsearch (default=1e-10)')
 	args_parser.add_argument('-fl', '--flanking', required=False, default=int(0), help='length of flanking regions upstream and downstream of the viral region to output in the final .fna files (default=0)')
 	args_parser.add_argument('-t', '--cpus', required=False, default=str(1), help='number of cpus to use for the HMMER3 search')
 	args_parser.add_argument('-b', '--batch', type=bool, default=False, const=True, nargs='?', help='Batch mode: implies the input is a folder of .fna files that each will be run iteratively')
@@ -418,6 +420,7 @@ def main(argv=None):
 	phagesize = int(args_parser.minsize)*1000
 	minscore = int(args_parser.minscore)
 	minvog = int(args_parser.minvog)
+	evalue = str(args_parser.evalue)
 	cpus = args_parser.cpus
 	plotflag = args_parser.figplot
 	redo = args_parser.redo
@@ -445,10 +448,10 @@ def main(argv=None):
 				newproject = os.path.join(project, name)
 				newinput = os.path.join(input, i)
 				print("Running viralrecall on "+ i + " and output will be deposited in "+ newproject)
-				run_program(newinput, newproject, database, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch, summary_file)
+				run_program(newinput, newproject, database, window, phagesize, minscore, minvog, evalue, cpus, plotflag, redo, flanking, batch, summary_file)
 	else:
 		summary_file = 1
-		run_program(input, project, database, window, phagesize, minscore, minvog, cpus, plotflag, redo, flanking, batch, summary_file)
+		run_program(input, project, database, window, phagesize, minscore, minvog, evalue, cpus, plotflag, redo, flanking, batch, summary_file)
 
 	return 0
 
