@@ -1,5 +1,6 @@
 # ViralRecall
 ViralRecall is a flexible command-line tool for predicting prophage and other virus-like regions in genomic data.
+This code is under development and likely to change as bugs are identified.
 
 ### Dependencies
 ViralRecall is written in Python 3.5.6 and requires biopython, matplotlib, numpy, and pandas. 
