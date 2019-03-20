@@ -13,18 +13,20 @@ pfam = "hmm/pfam.reduced.hmm"
 
 # predict proteins from genome FNA file
 def predict_proteins(genome_file, project, redo, batch):
-	if batch:
-		file_name = os.path.basename(genome_file)
-		protein_file = os.path.join(project, re.sub('.fna', '.faa', file_name))
-		#protein_file = os.path.join(project, project+".faa")
-	else:
-		base_name = os.path.basename(genome_file)
-		protein_file = os.path.join(project, re.sub('.fna', '.faa', base_name))
-	
+
 	seqdict = SeqIO.to_dict(SeqIO.parse(genome_file, "fasta"))
-	if len(seqdict < 1):
-		print("Input does not appear to be FASTA format!")
-		break
+	if len(seqdict) < 1:
+		raise (genome_file+" does not appear to be in FASTA format!")
+
+	file_name = os.path.basename(genome_file)
+	file_base = os.path.splitext(file_name)[0]
+	if batch:
+		path_base = os.path.splitext(project)[0]
+		protein_file = os.path.join(path_base, file_base+".faa")
+	else:
+		base_name = os.path.basename(file_base)
+		#protein_file = os.path.join(project, re.sub('.fna', '.faa', base_name))
+		protein_file = os.path.join(project, project+".faa")	
 	
 	cmd = "prodigal -p meta -i "+ genome_file +" -a "+ protein_file
 	#print(cmd)
@@ -105,6 +107,7 @@ def get_seqlist(input_file):
 # run HMMER3
 def run_hmmer(input_file, db, suffix, cpus, redo, evalue):
 	output_file = re.sub(".faa", suffix, input_file)
+	#print(output_file)
 	if suffix == ".pfamout":
 		cmd = "hmmsearch --cut_nc --cpu "+ cpus +" --tblout "+ output_file +" "+ db +" "+ input_file
 	else:
@@ -197,7 +200,8 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 		#time.sleep(5)
 		pass
 	else:
-		os.mkdir(project)
+		foldername = os.path.splitext(project)[0]
+		os.mkdir(foldername)
 
 	# remove previous files before re-calculating results
 	if redo:
@@ -206,6 +210,7 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 				os.remove(os.path.join(project, files))
 
 	# predict proteins, run HMMER3 searches, and parse outputs
+	#print(input, project, redo, batch)
 	protein_file = predict_proteins(input, project, redo, batch)
 	vog_out  = run_hmmer(protein_file, database, ".vogout", cpus, redo, evalue)
 	pfam_out = run_hmmer(protein_file, pfam, ".pfamout", cpus, redo, evalue)
@@ -286,7 +291,9 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 		# now let's subset the genome to get only the prophage regions, and output that so we can look at it later if we want
 		subset = df3.ix[reg]
 		if batch:
-			base = os.path.basename(project)
+			basen = os.path.basename(project)
+			base = os.path.splitext(basen)[0]
+			#print(os.path.join(project, base+".vregion_annot.tsv"), project, base)
 			subset.to_csv(os.path.join(project, base+".vregion_annot.tsv"), sep='\t', index_label="protein_ids")
 		else:
 			subset.to_csv(os.path.join(project, project+".vregion_annot.tsv"), sep='\t', index_label="protein_ids")
@@ -448,12 +455,13 @@ def main(argv=None):
 			
 		file_list = os.listdir(input)
 		for i in file_list:
-			if i.endswith(".fna"):
-				name = re.sub(".fna", "", i)
-				newproject = os.path.join(project, name)
-				newinput = os.path.join(input, i)
-				print("Running viralrecall on "+ i + " and output will be deposited in "+ newproject)
-				run_program(newinput, newproject, database, window, phagesize, minscore, minvog, evalue, cpus, plotflag, redo, flanking, batch, summary_file)
+			#if i.endswith(".fna"):
+			#name = re.sub(".fna", "", i)
+			newproject = os.path.join(project, i)
+			newproject = os.path.splitext(newproject)[0]
+			newinput = os.path.join(input, i)
+			print("Running viralrecall on "+ i + " and output will be deposited in "+ newproject)
+			run_program(newinput, newproject, database, window, phagesize, minscore, minvog, evalue, cpus, plotflag, redo, flanking, batch, summary_file)
 	else:
 		summary_file = 1
 		run_program(input, project, database, window, phagesize, minscore, minvog, evalue, cpus, plotflag, redo, flanking, batch, summary_file)
