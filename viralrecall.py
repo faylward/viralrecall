@@ -21,7 +21,12 @@ def predict_proteins(genome_file, project, redo, batch):
 		base_name = os.path.basename(genome_file)
 		protein_file = os.path.join(project, re.sub('.fna', '.faa', base_name))
 	
-	cmd = "prodigal -i "+ genome_file +" -a "+ protein_file
+	seqdict = SeqIO.to_dict(SeqIO.parse(genome_file, "fasta"))
+	if len(seqdict < 1):
+		print("Input does not appear to be FASTA format!")
+		break
+	
+	cmd = "prodigal -p meta -i "+ genome_file +" -a "+ protein_file
 	#print(cmd)
 	cmd2 = shlex.split(cmd)
 	if not redo:
