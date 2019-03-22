@@ -280,6 +280,30 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 	summary = pandas.DataFrame()
 	tally = 0
 
+	capsid_file = open("hmm/capsid_acc.txt", "r")
+	capsid_lines = capsid_file.read()
+	capsid_acc = capsid_lines.splitlines()
+
+	wedge_file = open("hmm/wedge_acc.txt", "r")
+	wedge_lines = wedge_file.read()
+	wedge_acc = wedge_lines.splitlines()
+
+	portal_file = open("hmm/portal_acc.txt", "r")
+	portal_lines = portal_file.read()
+	portal_acc = portal_lines.splitlines()
+
+	term_file = open("hmm/terminase_acc.txt", "r")
+	term_lines = term_file.read()
+	term_acc = term_lines.splitlines()
+
+	tail_file = open("hmm/tail_acc.txt", "r")
+	tail_lines = tail_file.read()
+	tail_acc = tail_lines.splitlines()
+
+	spike_file = open("hmm/spike_acc.txt", "r")
+	spike_lines = spike_file.read()
+	spike_acc = spike_lines.splitlines()
+
 	for rep in reps:
 
 		df3 = df2.loc[df2['replicon'] == rep]
@@ -310,7 +334,15 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 			#print(minval, maxval)
 			#print(key, map(itemgetter(1), group), group, indices, [replicons[k] for k in indices])
 			#print([replicons[k] for k in indices])
-		
+
+			vogacc = subset["vog"].tolist()
+			num_capsid = len([e for e in vogacc if e in capsid_acc])
+			num_wedge = len([f for f in vogacc if f in wedge_acc])
+			num_portal = len([g for g in vogacc if g in portal_acc])
+			num_term = len([h for h in vogacc if h in term_acc])
+			num_tail = len([l for l in vogacc if l in tail_acc])
+			num_spike = len([l for l in vogacc if l in spike_acc])
+
 			score = numpy.mean(subset["score"])
 			voghits = len([i for i in subset["vogbit"].tolist() if i > 0])
 			length = int(float(maxval) - float(minval))
@@ -325,7 +357,7 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 				record = genome_dict[replicon]
 				contig_length = len(record.seq)
 
-				data = pandas.Series([replicon, minval, maxval, length, contig_length, score, voghits, len(indices)], name="viral_region_"+str(tally))
+				data = pandas.Series([replicon, minval, maxval, length, contig_length, score, voghits, len(indices), num_capsid, num_wedge, num_portal, num_term, num_tail, num_spike], name="viral_region_"+str(tally))
 				summary = summary.append(data)
 				#print(summary)
 
@@ -360,7 +392,7 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 
 		if summary.shape[1] > 0:
 
-			summary.columns = ['replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs']
+			summary.columns = ['replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs', 'capsid', 'wedge', 'portal', 'terminase', 'tail', 'spike']
 			base = os.path.basename(project)
 			summary_file.write(base +"\t"+ str(summary.shape[0]) +"\n")
 			summary.to_csv(os.path.join(project, base+".summary.tsv"), sep="\t", index_label="viral_regions")
@@ -371,7 +403,7 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 
 	else:
 		if summary.shape[1] > 0:
-			summary.columns = ['replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs']
+			summary.columns = ['replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs', 'capsid', 'wedge', 'portal', 'terminase', 'tail', 'spike']
 			summary.to_csv(os.path.join(project, project+".summary.tsv"), sep="\t", index_label="viral_regions")
 			df2.to_csv(os.path.join(project, project+".full_annot.tsv"), sep="\t", index_label="protein_ids")
 
