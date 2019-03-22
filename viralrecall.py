@@ -280,27 +280,27 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 	summary = pandas.DataFrame()
 	tally = 0
 
-	capsid_file = open("hmm/capsid_acc.txt", "r")
+	capsid_file = open("acc/capsid_acc.txt", "r")
 	capsid_lines = capsid_file.read()
 	capsid_acc = capsid_lines.splitlines()
 
-	wedge_file = open("hmm/wedge_acc.txt", "r")
+	wedge_file = open("acc/wedge_acc.txt", "r")
 	wedge_lines = wedge_file.read()
 	wedge_acc = wedge_lines.splitlines()
 
-	portal_file = open("hmm/portal_acc.txt", "r")
+	portal_file = open("acc/portal_acc.txt", "r")
 	portal_lines = portal_file.read()
 	portal_acc = portal_lines.splitlines()
 
-	term_file = open("hmm/terminase_acc.txt", "r")
+	term_file = open("acc/terminase_acc.txt", "r")
 	term_lines = term_file.read()
 	term_acc = term_lines.splitlines()
 
-	tail_file = open("hmm/tail_acc.txt", "r")
+	tail_file = open("acc/tail_acc.txt", "r")
 	tail_lines = tail_file.read()
 	tail_acc = tail_lines.splitlines()
 
-	spike_file = open("hmm/spike_acc.txt", "r")
+	spike_file = open("acc/spike_acc.txt", "r")
 	spike_lines = spike_file.read()
 	spike_acc = spike_lines.splitlines()
 
