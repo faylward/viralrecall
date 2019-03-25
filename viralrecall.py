@@ -210,6 +210,12 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 			if files.endswith(".tsv") or "_viral_region_" in files:
 				os.remove(os.path.join(project, files))
 
+	if batch:
+		relpath = os.path.split(project)[1]
+		relpathbase = os.path.splitext(relpath)[0]
+		base = os.path.splitext(project)[0]
+		print(project, base, relpath, relpathbase)
+
 	# predict proteins, run HMMER3 searches, and parse outputs
 	#print(input, project, redo, batch)
 	protein_file = predict_proteins(input, project, redo, batch)
@@ -316,10 +322,8 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 		# now let's subset the genome to get only the prophage regions, and output that so we can look at it later if we want
 		subset = df3.ix[reg]
 		if batch:
-			basen = os.path.basename(project)
-			base = os.path.splitext(basen)[0]
 			#print(os.path.join(project, base+".vregion_annot.tsv"), project, base)
-			subset.to_csv(os.path.join(project, base+".vregion_annot.tsv"), sep='\t', index_label="protein_ids")
+			subset.to_csv(os.path.join(base, relpathbase+".vregion_annot.tsv"), sep='\t', index_label="protein_ids")
 		else:
 			subset.to_csv(os.path.join(project, project+".vregion_annot.tsv"), sep='\t', index_label="protein_ids")
 
@@ -363,8 +367,8 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 
 				# now let's output the proteins and nucleic acid sequence of the putative prophage
 				if batch:
-					base = os.path.basename(project)
-					protein_file = os.path.join(project, base+"_viral_region_"+str(tally)+".faa")
+					#base = os.path.basename(project)
+					protein_file = os.path.join(base, relpathbase+"_viral_region_"+str(tally)+".faa")
 				else:
 					protein_file = os.path.join(project, project+"_viral_region_"+str(tally)+".faa")
 
@@ -373,8 +377,8 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 				SeqIO.write(records, protein_file, "fasta")
 
 				if batch:
-					base = os.path.basename(project)
-					nucl_file = open(os.path.join(project, base+"_viral_region_"+str(tally)+".fna"), "w")
+					#base = os.path.basename(project)
+					nucl_file = open(os.path.join(base, relpathbase+"_viral_region_"+str(tally)+".fna"), "w")
 				else:
 					nucl_file = open(os.path.join(project, project+"_viral_region_"+str(tally)+".fna"), "w")
 
@@ -388,17 +392,17 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 	# if we find any prophage let's output a summary file
 
 	if batch:
-		df2.to_csv(os.path.join(project, base+".full_annot.tsv"), sep="\t", index_label="protein_ids")
+		df2.to_csv(os.path.join(base, relpathbase+".full_annot.tsv"), sep="\t", index_label="protein_ids")
 
 		if summary.shape[1] > 0:
 
 			summary.columns = ['replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs', 'capsid', 'wedge', 'portal', 'terminase', 'tail', 'spike']
-			base = os.path.basename(project)
+			#base = os.path.basename(project)
 			summary_file.write(base +"\t"+ str(summary.shape[0]) +"\n")
-			summary.to_csv(os.path.join(project, base+".summary.tsv"), sep="\t", index_label="viral_regions")
+			summary.to_csv(os.path.join(base, relpathbase+".summary.tsv"), sep="\t", index_label="viral_regions")
 
 		else:
-			base = os.path.basename(project)
+			#base = os.path.basename(project)
 			summary_file.write(base +"\t0\n")
 
 	else:
@@ -431,7 +435,7 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 		plt.xticks(bounds, bound_labels)
 		plt.ylim(0, numpy.nanmax(df2["rolling"]))
 		if batch:
-			f.savefig(project+".pdf", bbox_inches='tight')
+			f.savefig(base, relpathbase+".pdf", bbox_inches='tight')
 		else:
 			f.savefig(os.path.join(project, project+".pdf"), bbox_inches='tight')
 	#######################################################
@@ -491,7 +495,7 @@ def main(argv=None):
 			#if i.endswith(".fna"):
 			#name = re.sub(".fna", "", i)
 			newproject = os.path.join(project, i)
-			newproject = os.path.splitext(newproject)[0]
+			#newproject = os.path.splitext(newproject)[0]
 			newinput = os.path.join(input, i)
 			print("Running viralrecall on "+ i + " and output will be deposited in "+ newproject)
 			run_program(newinput, newproject, database, window, phagesize, minscore, minvog, evalue, cpus, plotflag, redo, flanking, batch, summary_file)
