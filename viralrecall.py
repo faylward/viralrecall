@@ -78,7 +78,8 @@ def window(seq, n=25):
         yield result
 
 # define function to acquire protein statistics from the faa file
-def get_seqlist(input_file):
+def get_seqlist(input_file, project):
+	prot2genome = {}
 	record_dict = {}
 	seqlist = {}
 	strandlist = {}
@@ -96,13 +97,14 @@ def get_seqlist(input_file):
 		strandlist[i.id] = strand
 		prot2start[i.id] = start
 		prot2end[i.id] = end
+		prot2genome[i.id] = project
 
 		protein = i.id
 		protlist = protein.split("_")
 		contig = "_".join(protlist[0:len(protlist)-1])
 		prot2contig[protein] = contig
 
-	return seqlist, strandlist, prot2start, prot2end, prot2contig, record_dict
+	return prot2genome, seqlist, strandlist, prot2start, prot2end, prot2contig, record_dict
 		
 # run HMMER3
 def run_hmmer(input_file, db, suffix, cpus, redo, evalue):
@@ -147,9 +149,11 @@ def parse_hmmout(hmmout):
 			if score > bit_dict[protein]:
 				if hit == "VOG02293" or hit == "VOG04678" or hit == "VOG01352" or hit == "VOG09752":
 					#print(protein, hit, score)
-					pass
+					#pass
 					#hit = ""
 					#bit = float(0)
+					bit_dict[protein] = 0
+					hit_dict[protein] = hit
 				else:
 					bit_dict[protein] = score
 					hit_dict[protein] = hit
@@ -195,20 +199,20 @@ def get_regions(list1):
 def run_program(input, project, database, window, phagesize, minscore, minvog, evalue, cpus, plotflag, redo, flanking, batch, summary_file):
 
 	# create output directories
-	if os.path.isdir(project):
+	foldername = os.path.splitext(project)[0]
+	if os.path.isdir(foldername):
 		#raise Exception(project+' already exists')
 		#print("\n*******************************************************************************\nOverwriting existing project folder! Waiting 5 seconds so you have time to exit\n*******************************************************************************")
 		#time.sleep(5)
 		pass
 	else:
-		foldername = os.path.splitext(project)[0]
 		os.mkdir(foldername)
 
 	# remove previous files before re-calculating results
 	if redo:
-		for files in os.listdir(project):
+		for files in os.listdir(foldername):
 			if files.endswith(".tsv") or "_viral_region_" in files:
-				os.remove(os.path.join(project, files))
+				os.remove(os.path.join(foldername, files))
 
 	if batch:
 		relpath = os.path.split(project)[1]
@@ -231,15 +235,15 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 		vog_annot[i] = vog_desc[vog_hit[i]]
 		
 	# get protein features from Prodigal FASTA headers
-	seqs, strands, prot2start, prot2end, prot2contig, record_dict = get_seqlist(protein_file)
+	prot2genome, seqs, strands, prot2start, prot2end, prot2contig, record_dict = get_seqlist(protein_file, os.path.basename(project))
 
 	# get dictionary of nucleic acid sequences
 	genome_dict = get_fasta(input)
 	
 	# set up Pandas DataFrame of the full genome annotation
-	names = ['replicon', 'vog', 'vogbit', 'vog_desc', 'pfam', 'pfambit', 'protlength', 'strand', 'start', 'end']
+	names = ['genome', 'replicon', 'vog', 'vogbit', 'vog_desc', 'pfam', 'pfambit', 'protlength', 'strand', 'start', 'end']
 	df = pandas.DataFrame()
-	for index, i in enumerate([prot2contig, vog_hit, vog_bit, vog_annot, pfam_hit, pfam_bit, seqs, strands, prot2start, prot2end]):
+	for index, i in enumerate([prot2genome, prot2contig, vog_hit, vog_bit, vog_annot, pfam_hit, pfam_bit, seqs, strands, prot2start, prot2end]):
 		s1 = pandas.DataFrame(pandas.Series(i, name = names[index]))
 		df = pandas.concat([df, s1], axis=1, sort=True)
 
