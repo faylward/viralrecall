@@ -237,6 +237,10 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 	# get protein features from Prodigal FASTA headers
 	prot2genome, seqs, strands, prot2start, prot2end, prot2contig, record_dict = get_seqlist(protein_file, os.path.basename(project))
 
+	genomes = list(prot2genome.values())
+	genome = genomes[0]
+	#print(genomes)
+
 	# get dictionary of nucleic acid sequences
 	genome_dict = get_fasta(input)
 	
@@ -365,7 +369,7 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 				record = genome_dict[replicon]
 				contig_length = len(record.seq)
 
-				data = pandas.Series([replicon, minval, maxval, length, contig_length, score, voghits, len(indices), num_capsid, num_wedge, num_portal, num_term, num_tail, num_spike], name="viral_region_"+str(tally))
+				data = pandas.Series([genome, replicon, minval, maxval, length, contig_length, score, voghits, len(indices), num_capsid, num_wedge, num_portal, num_term, num_tail, num_spike], name="viral_region_"+str(tally))
 				summary = summary.append(data)
 				#print(summary)
 
@@ -400,7 +404,7 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 
 		if summary.shape[1] > 0:
 
-			summary.columns = ['replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs', 'capsid', 'wedge', 'portal', 'terminase', 'tail', 'spike']
+			summary.columns = ['genome', 'replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs', 'capsid', 'wedge', 'portal', 'terminase', 'tail', 'spike']
 			#base = os.path.basename(project)
 			summary_file.write(base +"\t"+ str(summary.shape[0]) +"\n")
 			summary.to_csv(os.path.join(base, relpathbase+".summary.tsv"), sep="\t", index_label="viral_regions")
@@ -411,7 +415,7 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 
 	else:
 		if summary.shape[1] > 0:
-			summary.columns = ['replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs', 'capsid', 'wedge', 'portal', 'terminase', 'tail', 'spike']
+			summary.columns = ['genome', 'replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs', 'capsid', 'wedge', 'portal', 'terminase', 'tail', 'spike']
 			summary.to_csv(os.path.join(project, project+".summary.tsv"), sep="\t", index_label="viral_regions")
 			df2.to_csv(os.path.join(project, project+".full_annot.tsv"), sep="\t", index_label="protein_ids")
 
