@@ -126,7 +126,7 @@ def run_hmmer(input_file, db, suffix, cpus, redo, evalue):
 
 	if not redo:
 		subprocess.call(cmd2, stdout=open("out.txt", "w"), stderr=open("err.txt", "w"))
-		os.remove("out.txt")
+		#os.remove("out.txt")
 	return output_file
 
 # define function for parsing HMMER3 output
@@ -514,6 +514,7 @@ if __name__ == '__main__':
 	sys.exit(status)
 
 # end
+
 
 
 
