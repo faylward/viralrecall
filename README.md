@@ -1,6 +1,5 @@
 # ViralRecall
 ViralRecall is a flexible command-line tool for predicting prophage and other virus-like regions in genomic data.
-This code is under development and likely to change as bugs are identified.
 
 ### Dependencies
 ViralRecall is written in Python 3.5.6 and requires biopython, matplotlib, numpy, and pandas. 
@@ -19,7 +18,7 @@ or if you don't have sudo priveleges, you can try with conda:
 
 and
 
->conda install hmmer3 -c bioconda
+>conda install hmmer -c bioconda
 
 ### Installation
 Please ensure you are using > Python 3.5.2 and have the appropriate python modules installed. If this is an issue please create a Python environment using conda (see here https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) 
