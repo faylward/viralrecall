@@ -3,12 +3,12 @@ ViralRecall is a flexible command-line tool for predicting prophage and other vi
 
 ## Docker for the impatient -- or reproducibility conscience
 
-wget -O hmm.tar.gz https://data.lib.vt.edu/downloads/8k71nh28c
-tar -xf hmm.tar.gz
-docker run -it -v pwd/hmm:/viralrecall/hmm rsettlag/viralrecall bash
-conda activate viralrecall
-cd viralrecall
-python viralrecall.py
+wget -O hmm.tar.gz https://data.lib.vt.edu/downloads/8k71nh28c \
+tar -xf hmm.tar.gz \
+docker run -it -v pwd/hmm:/viralrecall/hmm rsettlag/viralrecall bash \
+conda activate viralrecall \
+cd viralrecall \
+python viralrecall.py -h \
 python viralrecall.py -i examples/test_seq.fna -p test_outdir -t 2 -db small -f 
 
 ### Dependencies
