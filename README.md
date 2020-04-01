@@ -12,7 +12,7 @@ python viralrecall.py -h \
 python viralrecall.py -i examples/test_seq.fna -p test_outdir -t 2 -db small -f 
 
 ### Dependencies
-ViralRecall is written in Python 3.5.6 and requires biopython, matplotlib, numpy, and pandas. Note, as of March 31, 2020, Python 3.7.4 produces a data type error.
+ViralRecall is written in Python 3.5.6 and requires biopython, matplotlib, numpy, and pandas. __Note, as of March 31, 2020, Python 3.7.4 produces a data type error.__
 
 ViralRecall uses Prodigal and HMMER3 for protein prediction and HMM searches, respectively. Please ensure these tools are installed in your PATH before using. 
 One a Unix system you should be able to install these tools with: 
