@@ -104,7 +104,8 @@ All of the output files should have their own folder in the folderout directory.
 
 ## Citation
 
-Citation for this tool is pending. If you plan on using this tool in an article please email Frank Aylward to ask the best way to cite this work at faylward _at_ vt dot edu
+Citation for this tool is pending. 
+For questions or comments feel free to email Frank Aylward at faylward _at_ vt dot edu
 
 Also, since this tool requires Prodigal and HMMER3, please cite thest tools as well. Their citations are:
 
