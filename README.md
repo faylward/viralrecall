@@ -26,7 +26,8 @@ ViralRecall was tested on Ubuntu 16.04 and should work on most Unix-based system
 > python viralrecall.py -h
 
 ### Databases
-Viralrecall uses two main HMM databases to analyze viral signatures in genomic data. The first is Pfam, which is a broad-specificity database that detects many protein families that are common in the genomes of cellular organisms. The Pfam database here has been modified to remove common viral protein families. The second HMM database is VOGDB, which is a comprehensive database of known viral protein families. The full VOG HMM database is quite large, and in some situations users may wish to use smaller sets to speed up runtime. We have created three VOG database that vary in size (all, large, and small). Users wishing to perform an exhaustive search should use the "all" database, while those preferring a faster search may wish to use the "small" database (the "large" database is an intermediate size option). 
+Viralrecall can be run using either of two viral HMM databases: 1) VOGDB, which contains a wide collection of viral orthologous groups and is useful for broad characterization of viral signatures, or 2) NCVOGs, which contains a set of HMM specific to Nucleo-Cytoplasmic Large DNA Viruses (NCLDV). In addition, ViralRecall matches proteins against the Pfam database (Pfam v. 31), which is a broad-specificity database that detects many protein families that are common in the genomes of cellular organisms. The Pfam database here has been modified to remove common viral protein families. 
+
 
 The database files are available for download from the Virginia Tech library system. To download and unpack, navigate to the folder that contains the viralrecall.py script and type:
 > wget -O hmm.tar.gz https://data.lib.vt.edu/downloads/8k71nh28c
@@ -37,7 +38,7 @@ and then
 
 ### Basic Usage
 To test if ViralRecall will run properly type:
-> python viralrecall.py -i examples/test_seq.fna -p test_outdir -t 2 -db small -f
+> python viralrecall.py -i examples/arm29B.fna -p test_outdir -t 2 -db NCLDV -f
 
 Results should be located in the test_outdir folder. 
 The output folder will contain:
@@ -46,7 +47,7 @@ The output folder will contain:
 
 *.full_annot.tsv:        A full annotation table of the predicted ORFs. 
 
-*.prophage.annot.tsv:    An annotation of only the viral regions (only present if some viral regions found)
+*.vregion.annot.tsv:    An annotation of only the viral regions (only present if some viral regions found)
 
 *summary.tsv             Summary statistics for the predicted viral regions. 
 
@@ -62,6 +63,10 @@ Please be sure to use only .fna files as input.
 ### Options
 
 There are several parameters you can change in viralrecall depending on your preferences and the data you're analyzing. The important parameters that will influence the results are:
+
+
+**-db, --database**
+This is the database usef for viral detection. Use "general" for the VOGDB, and "NCLDV" for NCVOGs. NCVOGs are more useful for NCLDV-specific searches, but other viruses will not be detected. 
 
 **-s, --minscore**
 This is the mean score that a genomic regions needs to have in order to pass the filter and get reported as a viral region. The score is calculated from the HMMER3 scores, with higher scores indicating more and better matches to the VOG database, and lower scores indicating more and higher matches to the Pfam database. The default is 10. 
