@@ -85,13 +85,13 @@ Minimum size, in kilobases, of the viral regions to report.
 Minimum number of hits against the VOG database that must be recorded in a region in order for it to be reported (larger values == higher confidence). 
 
 For example, if we wanted to recover only long, well-defined viral regions we could use the following command:
-> python viralrecall.py -i examples/test_seq.fna -p testout -s 15 -m 30 -v 10
+> python viralrecall.py -i examples/arm29B.fna -p testout -s 15 -m 30 -v 10
 
 Here we are asking for only regions that have a mean score >= 15, are at least 30 kilobases long, and have at least 10 VOG hits.
 
 If we want to quickly re-do the above analysis with different parameters, but without re-doing gene predictions and HMMER3 searches, we can use the -r flag:
 
-> python viralrecall.py -i examples/test_seq.fna -p testout -s 15 -m 30 -v 10 -r
+> python viralrecall.py -i examples/arm29B.fna -p testout -s 15 -m 30 -v 10 -r
 
 This should re-calculate the results quickly and allow you to identify the most appropriate ones for your analysis. 
 
