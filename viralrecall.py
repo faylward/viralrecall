@@ -26,7 +26,7 @@ def predict_proteins(genome_file, project, redo, batch):
 	else:
 		base_name = os.path.basename(file_base)
 		#protein_file = os.path.join(project, re.sub('.fna', '.faa', base_name))
-		protein_file = os.path.join(project, project+".faa")	
+		protein_file = os.path.join(project, project+".faa")
 	
 	cmd = "prodigal -p meta -i "+ genome_file +" -a "+ protein_file
 	#print(cmd)
@@ -38,7 +38,7 @@ def predict_proteins(genome_file, project, redo, batch):
 	# get vog hmm descriptions
 def get_annot(annot_file):
 	input = open(annot_file, "r")
-	vog_desc = {}
+	vog_desc = defaultdict(lambda:"NA")
 	for i in input.readlines():
 		line = i.rstrip()
 		tabs = line.split("\t")
@@ -112,19 +112,25 @@ def run_hmmer(input_file, db, suffix, cpus, redo, evalue):
 	#print(output_file)
 	if suffix == ".pfamout":
 		cmd = "hmmsearch --cut_nc --cpu "+ cpus +" --tblout "+ output_file +" "+ db +" "+ input_file
-	else:
-		if db == "large":
-			vogdb = "hmm/vog.large.hmm"
-		elif db == "small":
-			vogdb = "hmm/vog.large.hmm"
-		elif db == "all":
+	elif suffix == ".vogout":
+#		if db == "large":
+#			vogdb = "hmm/vog.large.hmm"
+#		elif db == "small":
+#			vogdb = "hmm/vog.large.hmm"
+#		elif db == "all":
+#			vogdb = "hmm/vogdb.hmm"
+		if db == "general":
 			vogdb = "hmm/vogdb.hmm"
+			cmd = "hmmsearch -E "+ str(evalue) +" --cpu "+ cpus +" --tblout "+ output_file +" "+ vogdb +" "+ input_file
+		elif db == "NCLDV":
+			vogdb = "hmm/NCVOG.hmm"
+			cmd = "hmmsearch -E "+ str(evalue) +" --cpu "+ cpus +" --tblout "+ output_file +" "+ vogdb +" "+ input_file	
 
-		cmd = "hmmsearch -E "+ str(evalue) +" --cpu "+ cpus +" --tblout "+ output_file +" "+ vogdb +" "+ input_file	
-		#print(evalue, cmd)
+	#print(evalue, cmd)
 	cmd2 = shlex.split(cmd)
 
 	if not redo:
+		pass
 		subprocess.call(cmd2, stdout=open("out.txt", "w"), stderr=open("err.txt", "w"))
 		#os.remove("out.txt")
 	return output_file
@@ -218,7 +224,7 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 		relpath = os.path.split(project)[1]
 		relpathbase = os.path.splitext(relpath)[0]
 		base = os.path.splitext(project)[0]
-		print(project, base, relpath, relpathbase)
+		#print(project, base, relpath, relpathbase)
 
 	# predict proteins, run HMMER3 searches, and parse outputs
 	#print(input, project, redo, batch)
@@ -294,29 +300,29 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 	summary = pandas.DataFrame()
 	tally = 0
 
-	capsid_file = open("acc/capsid_acc.txt", "r")
-	capsid_lines = capsid_file.read()
-	capsid_acc = capsid_lines.splitlines()
+#	capsid_file = open("acc/capsid_acc.txt", "r")
+#	capsid_lines = capsid_file.read()
+#	capsid_acc = capsid_lines.splitlines()
 
-	wedge_file = open("acc/wedge_acc.txt", "r")
-	wedge_lines = wedge_file.read()
-	wedge_acc = wedge_lines.splitlines()
+#	wedge_file = open("acc/wedge_acc.txt", "r")
+#	wedge_lines = wedge_file.read()
+#	wedge_acc = wedge_lines.splitlines()
 
-	portal_file = open("acc/portal_acc.txt", "r")
-	portal_lines = portal_file.read()
-	portal_acc = portal_lines.splitlines()
+#	portal_file = open("acc/portal_acc.txt", "r")
+#	portal_lines = portal_file.read()
+#	portal_acc = portal_lines.splitlines()
 
-	term_file = open("acc/terminase_acc.txt", "r")
-	term_lines = term_file.read()
-	term_acc = term_lines.splitlines()
+#	term_file = open("acc/terminase_acc.txt", "r")
+#	term_lines = term_file.read()
+#	term_acc = term_lines.splitlines()
 
-	tail_file = open("acc/tail_acc.txt", "r")
-	tail_lines = tail_file.read()
-	tail_acc = tail_lines.splitlines()
+#	tail_file = open("acc/tail_acc.txt", "r")
+#	tail_lines = tail_file.read()
+#	tail_acc = tail_lines.splitlines()
 
-	spike_file = open("acc/spike_acc.txt", "r")
-	spike_lines = spike_file.read()
-	spike_acc = spike_lines.splitlines()
+#	spike_file = open("acc/spike_acc.txt", "r")
+#	spike_lines = spike_file.read()
+#	spike_acc = spike_lines.splitlines()
 
 	for rep in reps:
 
@@ -347,13 +353,13 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 			#print(key, map(itemgetter(1), group), group, indices, [replicons[k] for k in indices])
 			#print([replicons[k] for k in indices])
 
-			vogacc = subset["vog"].tolist()
-			num_capsid = len([e for e in vogacc if e in capsid_acc])
-			num_wedge = len([f for f in vogacc if f in wedge_acc])
-			num_portal = len([g for g in vogacc if g in portal_acc])
-			num_term = len([h for h in vogacc if h in term_acc])
-			num_tail = len([l for l in vogacc if l in tail_acc])
-			num_spike = len([l for l in vogacc if l in spike_acc])
+		#	vogacc = subset["vog"].tolist()
+		#	num_capsid = len([e for e in vogacc if e in capsid_acc])
+		#	num_wedge = len([f for f in vogacc if f in wedge_acc])
+		#	num_portal = len([g for g in vogacc if g in portal_acc])
+		#	num_term = len([h for h in vogacc if h in term_acc])
+		#	num_tail = len([l for l in vogacc if l in tail_acc])
+		#	num_spike = len([l for l in vogacc if l in spike_acc])
 
 			score = numpy.mean(subset["score"])
 			voghits = len([i for i in subset["vogbit"].tolist() if i > 0])
@@ -369,7 +375,8 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 				record = genome_dict[replicon]
 				contig_length = len(record.seq)
 
-				data = pandas.Series([genome, replicon, minval, maxval, length, contig_length, score, voghits, len(indices), num_capsid, num_wedge, num_portal, num_term, num_tail, num_spike], name="viral_region_"+str(tally))
+				#data = pandas.Series([genome, replicon, minval, maxval, length, contig_length, score, voghits, len(indices), num_capsid, num_wedge, num_portal, num_term, num_tail, num_spike], name="viral_region_"+str(tally))
+				data = pandas.Series([genome, replicon, minval, maxval, length, contig_length, score, voghits, len(indices)], name="viral_region_"+str(tally))
 				summary = summary.append(data)
 				#print(summary)
 
@@ -404,7 +411,8 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 
 		if summary.shape[1] > 0:
 
-			summary.columns = ['genome', 'replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs', 'capsid', 'wedge', 'portal', 'terminase', 'tail', 'spike']
+			#summary.columns = ['genome', 'replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs', 'capsid', 'wedge', 'portal', 'terminase', 'tail', 'spike']
+			summary.columns = ['genome', 'replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs']
 			#base = os.path.basename(project)
 			summary_file.write(base +"\t"+ str(summary.shape[0]) +"\n")
 			summary.to_csv(os.path.join(base, relpathbase+".summary.tsv"), sep="\t", index_label="viral_regions")
@@ -415,7 +423,7 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 
 	else:
 		if summary.shape[1] > 0:
-			summary.columns = ['genome', 'replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs', 'capsid', 'wedge', 'portal', 'terminase', 'tail', 'spike']
+			summary.columns = ['genome', 'replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_voghits', 'num_ORFs']
 			summary.to_csv(os.path.join(project, project+".summary.tsv"), sep="\t", index_label="viral_regions")
 			df2.to_csv(os.path.join(project, project+".full_annot.tsv"), sep="\t", index_label="protein_ids")
 
@@ -443,7 +451,7 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 		plt.xticks(bounds, bound_labels)
 		plt.ylim(0, numpy.nanmax(df2["rolling"]))
 		if batch:
-			f.savefig(base, relpathbase+".pdf", bbox_inches='tight')
+			f.savefig(os.path.join(base, relpathbase+".pdf"), bbox_inches='tight')
 		else:
 			f.savefig(os.path.join(project, project+".pdf"), bbox_inches='tight')
 	#######################################################
@@ -456,7 +464,7 @@ def main(argv=None):
 	args_parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description="ViralRecall: A flexible command-line tool for predicting prophage and other virus-like regions in genomic data \nFrank O. Aylward, Assistant Professor, Virginia Tech Department of Biological Sciences <faylward at vt dot edu>", epilog='*******************************************************************\nIf you use this tool in a publication please do not forget to cite:\nProdigal (DOI 10.1186/1471-2105-11-119)\nHMMER3 (DOI 10.1371/journal.pcbi.1002195)\n*******************************************************************')
 	args_parser.add_argument('-i', '--input', required=True, help='Input FASTA file (ending in .fna)')
 	args_parser.add_argument('-p', '--project', required=True, help='project name for outputs')
-	args_parser.add_argument('-db', '--database', required=False, default="all", help='VOG database to use. Options are "all", "large", or "small". See README for details')
+	args_parser.add_argument('-db', '--database', required=False, default="NCLDV", help='VOG database to use. Options are "general" for the general VOG db, and "NCLDV" for the NCVOG db. See README for details')
 	args_parser.add_argument('-w', '--window', required=False, default=int(15), help='sliding window size to use for detecting viral regions (default=15)')
 	args_parser.add_argument('-m', '--minsize', required=False, default=int(10), help='minimum length of viral regions to report, in kilobases (default=10)')
 	args_parser.add_argument('-s', '--minscore', required=False, default=int(10), help='minimum score of viral regions to report, with higher values indicating higher confidence (default=10)')
