@@ -9,8 +9,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import math
 
-pfam = "hmm/pfam.reduced.hmm"
-
 # predict proteins from genome FNA file
 def predict_proteins(genome_file, project, redo, batch):
 
@@ -111,7 +109,7 @@ def run_hmmer(input_file, db, suffix, cpus, redo, evalue):
 	output_file = re.sub(".faa", suffix, input_file)
 	#print(output_file)
 	if suffix == ".pfamout":
-		cmd = "hmmsearch --cut_nc --cpu "+ cpus +" --tblout "+ output_file +" "+ db +" "+ input_file
+		cmd = "hmmsearch --cut_nc --cpu "+ cpus +" --tblout "+ output_file +" hmm/pfam.for_ncvog.hmm "+ input_file
 	elif suffix == ".vogout":
 #		if db == "large":
 #			vogdb = "hmm/vog.large.hmm"
@@ -123,7 +121,7 @@ def run_hmmer(input_file, db, suffix, cpus, redo, evalue):
 			vogdb = "hmm/vogdb.hmm"
 			cmd = "hmmsearch -E "+ str(evalue) +" --cpu "+ cpus +" --tblout "+ output_file +" "+ vogdb +" "+ input_file
 		elif db == "NCLDV":
-			vogdb = "hmm/NCVOG.hmm"
+			vogdb = "hmm/NCVOG_2.0.hmm"
 			cmd = "hmmsearch -E "+ str(evalue) +" --cpu "+ cpus +" --tblout "+ output_file +" "+ vogdb +" "+ input_file	
 
 	#print(evalue, cmd)
@@ -230,7 +228,7 @@ def run_program(input, project, database, window, phagesize, minscore, minvog, e
 	#print(input, project, redo, batch)
 	protein_file = predict_proteins(input, project, redo, batch)
 	vog_out  = run_hmmer(protein_file, database, ".vogout", cpus, redo, evalue)
-	pfam_out = run_hmmer(protein_file, pfam, ".pfamout", cpus, redo, evalue)
+	pfam_out = run_hmmer(protein_file, "hmm/pfam.for_ncvog.hmm", ".pfamout", cpus, redo, evalue)
 
 	vog_hit, vog_bit = parse_hmmout(vog_out)
 	pfam_hit, pfam_bit = parse_hmmout(pfam_out)
