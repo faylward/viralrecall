@@ -38,7 +38,7 @@ and then
 
 In August 2020 we created a new NCVOG database that is specific to NCLDV. To download this database use:
 
-> wget -O hmm.tar.gz https://data.lib.vt.edu/downloads/x920fx05z
+> wget -O hmm.tar.gz https://data.lib.vt.edu/downloads/1r66j131z
 
 ### Basic Usage
 To test if ViralRecall will run properly type:
