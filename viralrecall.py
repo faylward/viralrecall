@@ -529,7 +529,8 @@ def run_program(input, project, database, window, phagesize, minscore, minhit, e
 			# now let's get a summary of each prophage region, and output that
 			for key, group in itertools.groupby(enumerate(reg), key=lambda ix:ix[0]-ix[1]):
 				indices = list(map(itemgetter(1), group))
-				subset = df3.ix[indices]
+				#subset = df3.ix[indices]
+				subset = df3.iloc[reg]
 				minval = min(subset["start"])
 				maxval = max(subset["end"])
 				#print(minval, maxval)
