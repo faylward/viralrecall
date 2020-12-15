@@ -53,12 +53,13 @@ The output folder will contain:
 
 *.vregion.annot.tsv:    An annotation of only the viral regions (only present if some viral regions found)
 
-*summary.tsv             Summary statistics for the predicted viral regions. 
+*summary.tsv:             Summary statistics for the predicted viral regions (or contig-level stats if the -c flag was used). 
 
-*.pfamout                Raw output of the Pfam HMMER3 search
+*.pfamout:                Raw output of the Pfam HMMER3 search
 
-*.vogout                 Raw output of the GVOG or VOGDB HMMER3 search
+*.vogout:                 Raw output of the GVOG or VOGDB HMMER3 search
 
+*.markerout               Raw output of the NCLDV marker gene HMMER3 search
 
 Additionally, for each viral region viralrecall will print out .faa and .fna files for the proteins and nucleotide sequences for the regions found. 
 Please be sure to use only .fna files as input. 
