@@ -39,7 +39,7 @@ and then
 
 ### Basic Usage
 To test if ViralRecall will run properly type:
-> python viralrecall.py -i examples/arm29B.fna -p test_outdir -t 2 -db NCLDV -f
+> python viralrecall.py -i examples/arm29B.fna -p test_outdir -t 2 -f
 
 Results should be located in the test_outdir folder. 
 The output folder will contain:
