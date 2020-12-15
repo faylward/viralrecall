@@ -21,16 +21,20 @@ and
 
 >conda install hmmer -c bioconda
 
-### Installation
+### Installation and Database Download
 Please ensure you are using > Python 3.5.2 and have the appropriate python modules installed. If this is an issue please create a Python environment using conda (see here https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) 
+
+To start:
+> git clone https://github.com/faylward/viralrecall
+> cd viralrecall
+
 ViralRecall was tested on Ubuntu 16.04 and should work on most Unix-based systems. To see the help menu use:
 > python viralrecall.py -h
 
-### Databases
 Viralrecall can be run using either of two viral HMM databases: 1) VOGDB, which contains a wide collection of viral orthologous groups and is useful for broad characterization of viral signatures, or 2) GVOGs, a custom set of Giant Virus Orthologous Groups that are fairly specific to Nucleo-Cytoplasmic Large DNA Viruses (NCLDV). The GVOGs database has replaced the NCVOG database used in a prevous version. In addition, ViralRecall matches proteins against the Pfam database (Pfam v. 32), which is a broad-specificity database that detects many protein families that are common in the genomes of cellular organisms.
 
-
 The database files are available for download from the Virginia Tech library system. To download and unpack, navigate to the folder that contains the viralrecall.py script and type:
+
 > wget -O hmm.tar.gz https://data.lib.vt.edu/downloads/6h440s637
 
 and then
@@ -38,7 +42,9 @@ and then
 > tar -xvzf hmm.tar.gz
 
 This should create a hmm/ directory with the appropriate HMM files, including the gvog.hmm database and the vogdb.hmm database (downloaded from the vogdb.org website on 12/14/2020). This directory should be located in the same directory as the acc/ directory and the viralrecall.py script. 
- 
+
+After this you should be able to run ViralRecall.py. To see the help menu you can run:
+> python viralrecall.py -h
  
 ### Basic Usage
 To test if ViralRecall will run properly type:
