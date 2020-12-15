@@ -91,7 +91,7 @@ If you have already run ViralRecall and you want to re-run it with different par
 Use this flag if the input is a folder of .fna files to search, rather than a single .fna file. 
 
 
-For example, if we wanted to recover viral regions from a eukaryotic contig we could use the following command:
+For example, if we wanted to recover regions of a eukaryotic contig with signatures of NCLDV we could use the following command:
 > python viralrecall.py -i examples/arm29B.fna -p testout -s 15 -m 30 -v 10
 
 Here we are asking for only regions that have a mean score >= 15, are at least 30 kilobases long, and have at least 10 VOG hits.
