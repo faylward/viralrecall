@@ -1,4 +1,4 @@
-# ViralRecall
+# ViralRecall v. 2.0
 ViralRecall is a flexible command-line tool for predicting prophage and other virus-like regions in genomic data.
 
 ### Dependencies
@@ -26,19 +26,15 @@ ViralRecall was tested on Ubuntu 16.04 and should work on most Unix-based system
 > python viralrecall.py -h
 
 ### Databases
-Viralrecall can be run using either of two viral HMM databases: 1) VOGDB, which contains a wide collection of viral orthologous groups and is useful for broad characterization of viral signatures, or 2) NCVOGs, which contains a set of HMM specific to Nucleo-Cytoplasmic Large DNA Viruses (NCLDV). In addition, ViralRecall matches proteins against the Pfam database (Pfam v. 31), which is a broad-specificity database that detects many protein families that are common in the genomes of cellular organisms. The Pfam database here has been modified to remove common viral protein families. 
+Viralrecall can be run using either of two viral HMM databases: 1) VOGDB, which contains a wide collection of viral orthologous groups and is useful for broad characterization of viral signatures, or 2) GOVGs, a custom set of HMM specific to Nucleo-Cytoplasmic Large DNA Viruses (NCLDV). The GVOGs database has replaced the NCVOG database used in a prevous version. In addition, ViralRecall matches proteins against the Pfam database (Pfam v. 32), which is a broad-specificity database that detects many protein families that are common in the genomes of cellular organisms.
 
 
 The database files are available for download from the Virginia Tech library system. To download and unpack, navigate to the folder that contains the viralrecall.py script and type:
-> wget -O hmm.tar.gz https://data.lib.vt.edu/downloads/8k71nh28c
+> wget -O hmm.tar.gz https://data.lib.vt.edu/downloads/6h440s637
 
 and then
 
 > tar -xvzf hmm.tar.gz
-
-In August 2020 we created a new NCVOG database that is specific to NCLDV. To download this database use:
-
-> wget -O hmm.tar.gz https://data.lib.vt.edu/downloads/1r66j131z
 
 ### Basic Usage
 To test if ViralRecall will run properly type:
@@ -70,7 +66,7 @@ There are several parameters you can change in viralrecall depending on your pre
 
 
 **-db, --database**
-This is the database usef for viral detection. Use "general" for the VOGDB, and "NCLDV" for NCVOGs. NCVOGs are more useful for NCLDV-specific searches, but other viruses will not be detected. 
+This is the database usef for viral detection. Use "VOG" for the VOGDB, and "GVOG" for NCVOGs. GVOGs are more useful for NCLDV-specific searches, and this is the default.
 
 **-s, --minscore**
 This is the mean score that a genomic regions needs to have in order to pass the filter and get reported as a viral region. The score is calculated from the HMMER3 scores, with higher scores indicating more and better matches to the VOG database, and lower scores indicating more and higher matches to the Pfam database. The default is 10. 
@@ -84,7 +80,17 @@ Minimum size, in kilobases, of the viral regions to report.
 **-v, --minvog**
 Minimum number of hits against the VOG database that must be recorded in a region in order for it to be reported (larger values == higher confidence). 
 
-For example, if we wanted to recover only long, well-defined viral regions we could use the following command:
+**-c, --contiglevel**
+If this option is used, contige-level stats will be provided for the input, and no viral regions will be output. This is useful for screening contigs for viral signatures.
+
+**-r, --redo**
+If you have already run ViralRecall and you want to re-run it with different parameters, you can use the -r flag to avoid re-running Prodigal and HMMER, which are the most time-consuming steps. 
+
+**-b, --batch**
+Use this flag if the input is a folder of .fna files to search, rather than a single .fna file. 
+
+
+For example, if we wanted to recover viral regions from a eukaryotic contig we could use the following command:
 > python viralrecall.py -i examples/arm29B.fna -p testout -s 15 -m 30 -v 10
 
 Here we are asking for only regions that have a mean score >= 15, are at least 30 kilobases long, and have at least 10 VOG hits.
@@ -105,13 +111,11 @@ Basic usage is:
 All of the output files should have their own folder in the folderout directory. You can also use the -b flag with the -r flag for quick re-calculations. 
 
 
-
 ## Citation
 
-Citation for this tool is pending. 
 For questions or comments feel free to email Frank Aylward at faylward _at_ vt dot edu
 
-Also, since this tool requires Prodigal and HMMER3, please cite thest tools as well. Their citations are:
+This tool requires Prodigal and HMMER3. Their citations are:
 
 Hyatt et al. “Prodigal: prokaryotic gene recognition and translation initiation site identification”. BMC bioinformatics, 2010. 
 Eddy, "A new generation of homology search tools based on probabilistic inference". Genome Informatics, 2009. 
