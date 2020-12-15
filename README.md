@@ -57,7 +57,7 @@ The output folder will contain:
 
 *.pfamout                Raw output of the Pfam HMMER3 search
 
-*.vogout                 Raw output of the VOGDB HMMER3 search
+*.vogout                 Raw output of the GVOG or VOGDB HMMER3 search
 
 
 Additionally, for each viral region viralrecall will print out .faa and .fna files for the proteins and nucleotide sequences for the regions found. 
@@ -70,10 +70,10 @@ There are several parameters you can change in viralrecall depending on your pre
 
 
 **-db, --database**
-This is the database usef for viral detection. Use "VOG" for the VOGDB, "GVOG" for GVOGs, and "marker" to only search against 10 NCLDV marker genes. GVOGs are more useful for NCLDV-specific searches, and this is the default. The "marker" option is much faster and may be useful for quickly screening large datasets. 
+This is the database usef for viral detection. The default is the GVOG database (also can be specifified with "GVOG"). "VOG" can be specified for the vogdb database, and "marker" to only search against 10 NCLDV marker genes. GVOGs are more useful for NCLDV-specific searches. The "marker" option is much faster and may be useful for quickly screening large datasets. 
 
 **-s, --minscore**
-This is the mean score that a genomic regions needs to have in order to pass the filter and get reported as a viral region. The score is calculated from the HMMER3 scores, with higher scores indicating more and better matches to the VOG database, and lower scores indicating more and higher matches to the Pfam database. The default is 10. 
+This is the mean score that a genomic regions needs to have in order to pass the filter and get reported as a viral region. The score is calculated from the HMMER3 scores, with higher scores indicating more and better matches to the GVOG database, and lower scores indicating more and higher matches to the Pfam database. The default is 10. 
 
 **-w, --window**
 Size of the sliding window to use for calculating moving averages. A smaller window may help predict short viral regions, but may split large viral regions into several pieces. 
@@ -81,8 +81,8 @@ Size of the sliding window to use for calculating moving averages. A smaller win
 **-m, --minsize**
 Minimum size, in kilobases, of the viral regions to report. 
 
-**-v, --minvog**
-Minimum number of hits against the VOG database that must be recorded in a region in order for it to be reported (larger values == higher confidence). 
+**-g, --minvog**
+Minimum number of hits against the GVOG database that must be recorded in a region in order for it to be reported (larger values == higher confidence). 
 
 **-c, --contiglevel**
 If this option is used, mean ViralRecall scores will be provided for the input contigs rather than viral regions. This is useful for screening contigs for viral signatures.
@@ -98,7 +98,7 @@ For example, if we wanted to recover regions of a eukaryotic contig with signatu
 
 > python viralrecall.py -i examples/arm29B.fna -p test_outdir -s 15 -m 30 -g 10
 
-Here we are asking for only regions that have a mean score >= 15, are at least 30 kilobases long, and have at least 10 VOG hits.
+Here we are asking for only regions that have a mean score >= 15, are at least 30 kilobases long, and have at least 10 GVOG hits.
 
 If we want to quickly re-do the above analysis with different parameters, but without re-doing gene predictions and HMMER3 searches, we can use the -r flag:
 
