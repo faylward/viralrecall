@@ -105,7 +105,11 @@ If we want to quickly re-do the above analysis with different parameters, but wi
 
 > python viralrecall.py -i examples/arm29B.fna -p test_outdir -s 15 -m 15 -g 15 -w 20 -r
 
-This should re-calculate the results quickly and allow you to identify the most appropriate ones for your analysis. 
+Maybe we want to re-do the analysis using a different e-value. The default is 1e-10, which is fairly stringent, so we can relax it a bit:
+
+python viralrecall.py -i examples/arm29B.fna -p test_outdir -s 15 -m 15 -g 15 -w 20 -r -e 1e-5
+
+So once you finishe the hmmer searches you can easily re-calculate things with the -r flag. 
 
 
 ### Batch mode
