@@ -96,7 +96,7 @@ Use this flag if the input is a folder of .fna files to search, rather than a si
 
 For example, if we wanted to recover regions of a eukaryotic contig with signatures of NCLDV, we could use the following command:
 
-> python viralrecall.py -i examples/arm29B.fna -p test_outdir -s 15 -g 30 -v 10
+> python viralrecall.py -i examples/arm29B.fna -p test_outdir -s 15 -m 30 -g 10
 
 Here we are asking for only regions that have a mean score >= 15, are at least 30 kilobases long, and have at least 10 VOG hits.
 
