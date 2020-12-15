@@ -518,8 +518,8 @@ def run_program(input, project, database, window, phagesize, minscore, minhit, e
 			reg = [int(i) for i in reg]
 
 			# now let's subset the genome to get only the prophage regions, and output that so we can look at it later if we want
-			#subset = df3.ix[reg]
-			subset = df3.iloc[reg]
+			subset = df3.ix[reg]
+			#subset = df3.iloc[reg]
 			if batch:
 				#print(os.path.join(project, base+".vregion_annot.tsv"), project, base)
 				subset.to_csv(os.path.join(base, relpathbase+".vregion_annot.tsv"), sep='\t', index_label="protein_ids")
@@ -529,8 +529,8 @@ def run_program(input, project, database, window, phagesize, minscore, minhit, e
 			# now let's get a summary of each prophage region, and output that
 			for key, group in itertools.groupby(enumerate(reg), key=lambda ix:ix[0]-ix[1]):
 				indices = list(map(itemgetter(1), group))
-				#subset = df3.ix[indices]
-				subset = df3.iloc[reg]
+				subset = df3.ix[indices]
+				#subset = df3.iloc[reg]
 				minval = min(subset["start"])
 				maxval = max(subset["end"])
 				#print(minval, maxval)
