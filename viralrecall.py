@@ -518,7 +518,8 @@ def run_program(input, project, database, window, phagesize, minscore, minhit, e
 			reg = [int(i) for i in reg]
 
 			# now let's subset the genome to get only the prophage regions, and output that so we can look at it later if we want
-			subset = df3.ix[reg]
+			#subset = df3.ix[reg]
+			subset = df3.iloc[reg]
 			if batch:
 				#print(os.path.join(project, base+".vregion_annot.tsv"), project, base)
 				subset.to_csv(os.path.join(base, relpathbase+".vregion_annot.tsv"), sep='\t', index_label="protein_ids")
