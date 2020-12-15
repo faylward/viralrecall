@@ -27,7 +27,7 @@ ViralRecall was tested on Ubuntu 16.04 and should work on most Unix-based system
 > python viralrecall.py -h
 
 ### Databases
-Viralrecall can be run using either of two viral HMM databases: 1) VOGDB, which contains a wide collection of viral orthologous groups and is useful for broad characterization of viral signatures, or 2) GOVGs, a custom set of HMM specific to Nucleo-Cytoplasmic Large DNA Viruses (NCLDV). The GVOGs database has replaced the NCVOG database used in a prevous version. In addition, ViralRecall matches proteins against the Pfam database (Pfam v. 32), which is a broad-specificity database that detects many protein families that are common in the genomes of cellular organisms.
+Viralrecall can be run using either of two viral HMM databases: 1) VOGDB, which contains a wide collection of viral orthologous groups and is useful for broad characterization of viral signatures, or 2) GVOGs, a custom set of Giant Virus Orthologous Groups that are fairly specific to Nucleo-Cytoplasmic Large DNA Viruses (NCLDV). The GVOGs database has replaced the NCVOG database used in a prevous version. In addition, ViralRecall matches proteins against the Pfam database (Pfam v. 32), which is a broad-specificity database that detects many protein families that are common in the genomes of cellular organisms.
 
 
 The database files are available for download from the Virginia Tech library system. To download and unpack, navigate to the folder that contains the viralrecall.py script and type:
@@ -67,7 +67,7 @@ There are several parameters you can change in viralrecall depending on your pre
 
 
 **-db, --database**
-This is the database usef for viral detection. Use "VOG" for the VOGDB, and "GVOG" for NCVOGs. GVOGs are more useful for NCLDV-specific searches, and this is the default.
+This is the database usef for viral detection. Use "VOG" for the VOGDB, "GVOG" for GVOGs, and "marker" to only search against 10 NCLDV marker genes. GVOGs are more useful for NCLDV-specific searches, and this is the default. The "marker" option is much faster and may be useful for quickly screening large datasets. 
 
 **-s, --minscore**
 This is the mean score that a genomic regions needs to have in order to pass the filter and get reported as a viral region. The score is calculated from the HMMER3 scores, with higher scores indicating more and better matches to the VOG database, and lower scores indicating more and higher matches to the Pfam database. The default is 10. 
@@ -82,7 +82,7 @@ Minimum size, in kilobases, of the viral regions to report.
 Minimum number of hits against the VOG database that must be recorded in a region in order for it to be reported (larger values == higher confidence). 
 
 **-c, --contiglevel**
-If this option is used, contige-level stats will be provided for the input, and no viral regions will be output. This is useful for screening contigs for viral signatures.
+If this option is used, mean ViralRecall scores will be provided for the input contigs rather than viral regions. This is useful for screening contigs for viral signatures.
 
 **-r, --redo**
 If you have already run ViralRecall and you want to re-run it with different parameters, you can use the -r flag to avoid re-running Prodigal and HMMER, which are the most time-consuming steps. 
