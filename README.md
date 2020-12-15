@@ -37,7 +37,7 @@ and then
 
 > tar -xvzf hmm.tar.gz
 
-This should create a hmm/ directory with the appropriate HMM files, including the gvog.hmm database and the vogdb.hmm database (downloaded from the vogdb.org website on 12/14/2020). 
+This should create a hmm/ directory with the appropriate HMM files, including the gvog.hmm database and the vogdb.hmm database (downloaded from the vogdb.org website on 12/14/2020). This directory should be located in the same directory as the acc/ directory and the viralrecall.py script. 
  
  
 ### Basic Usage
