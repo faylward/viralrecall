@@ -109,7 +109,7 @@ Maybe we want to re-do the analysis using a different e-value. The default is 1e
 
 python viralrecall.py -i examples/arm29B.fna -p test_outdir -s 15 -m 15 -g 15 -w 20 -r -e 1e-5
 
-So once you finishe the hmmer searches you can easily re-calculate things with the -r flag. 
+So once you finished the hmmer searches you can easily re-calculate things with the -r flag. 
 
 
 ### Batch mode
