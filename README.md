@@ -37,6 +37,9 @@ and then
 
 > tar -xvzf hmm.tar.gz
 
+This should create a hmm/ directory with the appropriate HMM files, including the gvog.hmm database and the vogdb.hmm database (downloaded from the vogdb.org website on 12/14/2020). 
+ 
+ 
 ### Basic Usage
 To test if ViralRecall will run properly type:
 > python viralrecall.py -i examples/arm29B.fna -p test_outdir -t 2 -f
@@ -91,14 +94,15 @@ If you have already run ViralRecall and you want to re-run it with different par
 Use this flag if the input is a folder of .fna files to search, rather than a single .fna file. 
 
 
-For example, if we wanted to recover regions of a eukaryotic contig with signatures of NCLDV we could use the following command:
+For example, if we wanted to recover regions of a eukaryotic contig with signatures of NCLDV, we could use the following command:
+
 > python viralrecall.py -i examples/arm29B.fna -p testout -s 15 -m 30 -v 10
 
 Here we are asking for only regions that have a mean score >= 15, are at least 30 kilobases long, and have at least 10 VOG hits.
 
 If we want to quickly re-do the above analysis with different parameters, but without re-doing gene predictions and HMMER3 searches, we can use the -r flag:
 
-> python viralrecall.py -i examples/arm29B.fna -p testout -s 15 -m 30 -v 10 -r
+> python viralrecall.py -i examples/arm29B.fna -p testout -s 15 -m 15 -v 15 -w 20 -r
 
 This should re-calculate the results quickly and allow you to identify the most appropriate ones for your analysis. 
 
@@ -111,8 +115,12 @@ Basic usage is:
 
 All of the output files should have their own folder in the folderout directory. You can also use the -b flag with the -r flag for quick re-calculations. 
 
+## Miscellaneous 
 
-## Citation
+Prodigal is intended to predict genes on prokaryotic genomes, and it therefore will draw an error if used on very long eukaryotic contigs (> 32 Mbp in length). I've re-compiled a binary of Prodigal that will run on longer contigs, and this is available in the bin/ folder of this GitHub repo. I have not yet extensively tested this recompiled binary, but it seems to work and provide reasonable results. If you wish to use this binary you will need to make sure it is located in your PATH (and not any other version of prodidigal you may have installed). 
+
+
+## References
 
 For questions or comments feel free to email Frank Aylward at faylward _at_ vt dot edu
 
