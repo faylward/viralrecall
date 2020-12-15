@@ -1,6 +1,6 @@
 # ViralRecall v. 2.0
 ViralRecall is a flexible command-line tool for detecting signatures of giant viruses (NCLDV) in genomic data.
-Version 2 has been updated to focus more on NCLDV compared to version 1, but the earlier options are still available. 
+Version 2 has been updated to focus more on NCLDV compared to version 1, but the original options are still available. 
 
 ### Dependencies
 ViralRecall is written in Python 3.5.6 and requires biopython, matplotlib, numpy, and pandas. 
