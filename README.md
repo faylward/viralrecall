@@ -135,7 +135,7 @@ Some users have noticed errors or warnings involving Pandas, which uses slightly
 
 ### References
 
-ViralRecall: A Flexible Command-Line Tool for the Detection of Giant Virus Signatures in Omic Data, FO Aylward and M Moniruzzaman, BioRxiv, doi: https://doi.org/10.1101/2020.12.15.422924. 
+ViralRecall: A Flexible Command-Line Tool for the Detection of Giant Virus Signatures in Omic Data, FO Aylward and M Moniruzzaman, BioRxiv, doi: https://www.biorxiv.org/content/10.1101/2020.12.15.422924v1. 
 
 For questions or comments feel free to email Frank Aylward at faylward _at_ vt dot edu
 
