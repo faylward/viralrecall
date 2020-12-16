@@ -128,10 +128,14 @@ All of the output files should have their own folder in the folderout directory.
 
 ### Miscellaneous 
 
-Prodigal is intended to predict genes on prokaryotic genomes, and it therefore will draw an error if used on very long eukaryotic contigs (> 32 Mbp in length). I've re-compiled a binary of Prodigal that will run on longer contigs, and this is available in the bin/ folder of this GitHub repo. I have not yet extensively tested this recompiled binary, but it seems to work and provide reasonable results. This is not the default version of prodigal that is used - if you wish to use this binary you will need to make sure it is located in your PATH (and not any other version of prodidigal you may have installed). 
+Prodigal is intended to predict genes on prokaryotic genomes, and it therefore will draw an error if used on very long eukaryotic contigs (> 32 Mbp in length). I've re-compiled a binary of Prodigal that will run on longer contigs, and this is available in the bin/ folder of this GitHub repo. This is NOT the default version of prodigal that is used - if you wish to use this binary you will need to make sure it is located in your PATH (and not any other version of prodigal you may have installed). 
+
+Some users have noticed errors or warnings involving Pandas, which uses slightly different syntax in different Python versions. These can can usually be resolved by changing the Python version used to 3.5.4. 
 
 
 ### References
+
+ViralRecall: A Flexible Command-Line Tool for the Detection of Giant Virus Signatures in Omic Data, FO Aylward and M Moniruzzaman, BioRxiv, doi: https://doi.org/10.1101/2020.12.15.422924. 
 
 For questions or comments feel free to email Frank Aylward at faylward _at_ vt dot edu
 
