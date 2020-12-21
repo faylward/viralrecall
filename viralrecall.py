@@ -37,7 +37,7 @@ def predict_proteins(genome_file, project, redo, batch):
 
 	# get vog hmm descriptions
 def get_annot(database):
-	if database == "VOG":
+	if database == "general":
 		input = open("hmm/vog.annotations.tsv", "r")
 		vdesc = defaultdict(lambda:"NA")
 		for i in input.readlines():
@@ -142,7 +142,7 @@ def run_hmmer(input_file, db, suffix, cpus, redo, evalue):
 		cmd = "hmmsearch --cut_nc --cpu "+ cpus +" --tblout "+ output_file +" hmm/pfam.hmm "+ input_file
 		#print(cmd)
 	elif suffix == ".vogout":
-		if db == "VOG":
+		if db == "general":
 			vogdb = "hmm/vogdb.hmm"
 			cmd = "hmmsearch --cpu "+ cpus +" --tblout "+ output_file +" "+ vogdb +" "+ input_file
 		elif db == "GVOG":
@@ -519,7 +519,6 @@ def run_program(input, project, database, window, phagesize, minscore, minhit, e
 
 			# now let's subset the genome to get only the prophage regions, and output that so we can look at it later if we want
 			subset = df3.ix[reg]
-			#subset = df3.iloc[reg]
 			if batch:
 				#print(os.path.join(project, base+".vregion_annot.tsv"), project, base)
 				subset.to_csv(os.path.join(base, relpathbase+".vregion_annot.tsv"), sep='\t', index_label="protein_ids")
@@ -530,7 +529,6 @@ def run_program(input, project, database, window, phagesize, minscore, minhit, e
 			for key, group in itertools.groupby(enumerate(reg), key=lambda ix:ix[0]-ix[1]):
 				indices = list(map(itemgetter(1), group))
 				subset = df3.ix[indices]
-				#subset = df3.iloc[reg]
 				minval = min(subset["start"])
 				maxval = max(subset["end"])
 				#print(minval, maxval)
@@ -663,10 +661,10 @@ def main(argv=None):
 	args_parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description="ViralRecall v. 2.0: A flexible command-line tool for predicting NCLDV-like regions in genomic data \nFrank O. Aylward, Virginia Tech Department of Biological Sciences <faylward at vt dot edu>", epilog='*******************************************************************\n\n*******************************************************************')
 	args_parser.add_argument('-i', '--input', required=True, help='Input FASTA file (ending in .fna)')
 	args_parser.add_argument('-p', '--project', required=True, help='project name for outputs')
-	args_parser.add_argument('-db', '--database', required=False, default="GVOG", help='Viral HMM database to use. Options are "GVOG" for the GVOG db, "VOG" for the vogdb, and "marker" for searching only a set of 10 conserved NCLDV markers (good for screening large datasets). See README for details')
+	args_parser.add_argument('-db', '--database', required=False, default="GVOG", help='Viral HMM database to use. Options are "general" for the general VOG db, "GVOG" for the GVOG db, and "marker" for searching only a set of 10 conserved NCLDV markers (good for screening large datasets). See README for details')
 	args_parser.add_argument('-w', '--window', required=False, default=int(15), help='sliding window size to use for detecting viral regions (default=15)')
 	args_parser.add_argument('-m', '--minsize', required=False, default=int(10), help='minimum length of viral regions to report, in kilobases (default=10)')
-	args_parser.add_argument('-s', '--minscore', required=False, default=int(1), help='minimum score of viral regions to report, with higher values indicating higher confidence (default=10)')
+	args_parser.add_argument('-s', '--minscore', required=False, default=int(1), help='minimum score of viral regions to report, with higher values indicating higher confidence (default=1)')
 	args_parser.add_argument('-g', '--minhit', required=False, default=int(4), help='minimum number of viral hits that each viral region must have to be reported (default=4)')
 	args_parser.add_argument('-e', '--evalue', required=False, default=str(1e-10), help='e-value that is passed to HMMER3 for the VOG hmmsearch (default=1e-10)')
 	args_parser.add_argument('-fl', '--flanking', required=False, default=int(0), help='length of flanking regions upstream and downstream of the viral region to output in the final .fna files (default=0)')
@@ -674,7 +672,7 @@ def main(argv=None):
 	args_parser.add_argument('-b', '--batch', type=bool, default=False, const=True, nargs='?', help='Batch mode: implies the input is a folder of .fna files that each will be run iteratively')
 	args_parser.add_argument('-r', '--redo', type=bool, default=False, const=True, nargs='?', help='run without re-launching prodigal and HMMER3 (for quickly re-calculating outputs with different parameters if you have already run once)')
 	args_parser.add_argument('-c', '--contiglevel', type=bool, default=False, const=True, nargs='?', help='calculate contig/replicon level statistics instead of looking at viral regions (good for screening contigs)')
-	args_parser.add_argument('-f', '--figplot', type=bool, default=False, const=True, nargs='?', help='Specify this flag if you would like a plot of the viral-like regions with the output (make sure matplotlib is installed and running properly)')
+	args_parser.add_argument('-f', '--figplot', type=bool, default=False, const=True, nargs='?', help='Specify this flag if you would like a plot of the viral-like regions with the output')
 	args_parser.add_argument('-v', '--version', action='version', version='ViralRecall v. 2.0')
 	args_parser = args_parser.parse_args()
 
