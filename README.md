@@ -26,6 +26,7 @@ Please ensure you are using > Python 3.5.2 and have the appropriate python modul
 
 To start:
 > git clone https://github.com/faylward/viralrecall
+
 > cd viralrecall
 
 ViralRecall was tested on Ubuntu 16.04 and should work on most Unix-based systems. To see the help menu use:
