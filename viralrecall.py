@@ -136,7 +136,7 @@ def get_seqlist(input_file, project):
 		
 # run HMMER3
 def run_hmmer(input_file, db, suffix, cpus, redo, evalue):
-	output_file = re.sub(".faa", suffix, input_file)
+	output_file = re.sub(".faa$", suffix, input_file)
 	#print(output_file)
 	if suffix == ".pfamout":
 		cmd = "hmmsearch --cut_nc --cpu "+ cpus +" --tblout "+ output_file +" hmm/pfam.hmm "+ input_file
@@ -157,7 +157,7 @@ def run_hmmer(input_file, db, suffix, cpus, redo, evalue):
 	#print(db)
 	cmd2 = shlex.split(cmd)
 
-	if not redo and not db == "maker":
+	if not redo and not db == "marker":
 		#pass
 		#print(cmd)
 		subprocess.call(cmd2, stdout=open("out.txt", "w"), stderr=open("err.txt", "w"))
@@ -166,7 +166,8 @@ def run_hmmer(input_file, db, suffix, cpus, redo, evalue):
 
 # define function for parsing HMMER3 output
 def parse_hmmout(hmmout, evalue):
-	input = open(hmmout, "r")
+
+	input = open(re.sub("\/$", "", hmmout), "r")
 	hit_dict = defaultdict(lambda:"NA")
 	bit_dict = defaultdict(float)
 	hit2pfam = {}
@@ -518,7 +519,8 @@ def run_program(input, project, database, window, phagesize, minscore, minhit, e
 			reg = [int(i) for i in reg]
 
 			# now let's subset the genome to get only the prophage regions, and output that so we can look at it later if we want
-			subset = df3.ix[reg]
+			#subset = df3.ix[reg]
+			subset = df3.iloc[reg]
 			if batch:
 				#print(os.path.join(project, base+".vregion_annot.tsv"), project, base)
 				subset.to_csv(os.path.join(base, relpathbase+".vregion_annot.tsv"), sep='\t', index_label="protein_ids")
@@ -528,7 +530,8 @@ def run_program(input, project, database, window, phagesize, minscore, minhit, e
 			# now let's get a summary of each prophage region, and output that
 			for key, group in itertools.groupby(enumerate(reg), key=lambda ix:ix[0]-ix[1]):
 				indices = list(map(itemgetter(1), group))
-				subset = df3.ix[indices]
+				#subset = df3.ix[indices]
+				subset = df3.iloc[indices]
 				minval = min(subset["start"])
 				maxval = max(subset["end"])
 				#print(minval, maxval)
@@ -692,6 +695,7 @@ def main(argv=None):
 	flanking = args_parser.flanking
 	batch = args_parser.batch
 
+	project = project.rstrip("/")
 	if batch:
 		if os.path.isdir(project):
 			pass
