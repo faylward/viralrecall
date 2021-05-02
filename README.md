@@ -36,7 +36,7 @@ Viralrecall can be run using either of two viral HMM databases: 1) VOGDB, which 
 
 The database files are available for download from the Virginia Tech library system. To download and unpack, navigate to the folder that contains the viralrecall.py script and type:
 
-> wget -O hmm.tar.gz https://data.lib.vt.edu/downloads/6h440s637
+> wget -O hmm.tar.gz https://zenodo.org/record/4710691/files/hmm.tar.gz?download=1
 
 and then
 
