@@ -607,16 +607,16 @@ def run_program(input, project, database, window, phagesize, minscore, minhit, e
 				summary.columns = ['replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_viralhits', 'num_ORFs', 'markers']
 				summary.to_csv(os.path.join(project, project+".summary.tsv"), sep="\t", index_label="viral_regions")
 
-				if database == "marker":
-					df2["vog"] = df2["vog"].replace(0, "no-search-performed")
-					df2["vdesc"] = df2["vdesc"].replace(0, "no-search-performed")
-					df2["pfam"] = df2["pfam"].replace(0, "no-search-performed")
-				else:
-					df2["vog"] = df2["vog"].replace(0, "no_hit")
-					df2["vdesc"] = df2["vdesc"].replace(0, "no_hit")
-					df2["pfam"] = df2["pfam"].replace(0, "no_hit")
+			if database == "marker":
+				df2["vog"] = df2["vog"].replace(0, "no-search-performed")
+				df2["vdesc"] = df2["vdesc"].replace(0, "no-search-performed")
+				df2["pfam"] = df2["pfam"].replace(0, "no-search-performed")
+			else:
+				df2["vog"] = df2["vog"].replace(0, "no_hit")
+				df2["vdesc"] = df2["vdesc"].replace(0, "no_hit")
+				df2["pfam"] = df2["pfam"].replace(0, "no_hit")
 
-				df2.to_csv(os.path.join(project, project+".full_annot.tsv"), sep="\t", index_label="protein_ids")
+			df2.to_csv(os.path.join(project, project+".full_annot.tsv"), sep="\t", index_label="protein_ids")
 
 
 	#######################################################
