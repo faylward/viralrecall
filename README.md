@@ -48,7 +48,7 @@ and then
 
 This should create a hmm/ directory with the appropriate HMM files, including the gvog.hmm database and the vogdb.hmm database (downloaded from the vogdb.org website on 12/14/2020). This directory should be located in the same directory as the acc/ directory and the viralrecall.py script. 
 
-The GVOG database was updated in May 2021. The new database is substantially smaller, which helps with runtime. But if you'd like to access the original GVOG database you can do so here:  https://zenodo.org/record/4710691/files/hmm.tar.gz?download=1
+Note: The GVOG database was updated in May 2021, and it is recommended to use this latest version. The new database is substantially smaller, among other things, and this helps with runtime. But if you'd like to access the original GVOG database you can do so here:  https://zenodo.org/record/4710691/files/hmm.tar.gz?download=1
 
 After you have downloaded and unpacked the database files you should be able to run viralrecall.py. To see the help menu you can run:
 > python viralrecall.py -h
