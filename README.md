@@ -36,7 +36,7 @@ Viralrecall can be run using either of two viral HMM databases: 1) VOGDB, which 
 
 The database files are available for download from the Virginia Tech library system. To download and unpack, navigate to the folder that contains the viralrecall.py script and type:
 
-> wget -O hmm.tar.gz https://zenodo.org/record/4710691/files/hmm.tar.gz?download=1
+> wget -O hmm.tar.gz https://zenodo.org/record/4762520/files/hmm.tar.gz?download=1
 
 and then
 
@@ -44,7 +44,9 @@ and then
 
 This should create a hmm/ directory with the appropriate HMM files, including the gvog.hmm database and the vogdb.hmm database (downloaded from the vogdb.org website on 12/14/2020). This directory should be located in the same directory as the acc/ directory and the viralrecall.py script. 
 
-After this you should be able to run viralrecall.py. To see the help menu you can run:
+The GVOG database was updated in May 2021. The new database is substantially smaller, which helps with runtime. But if you'd like to access the original GVOG database you can do so here:  https://zenodo.org/record/4710691/files/hmm.tar.gz?download=1
+
+After you have downloaded and unpacked the database files you should be able to run viralrecall.py. To see the help menu you can run:
 > python viralrecall.py -h
  
 ### Basic Usage
