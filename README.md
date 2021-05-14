@@ -148,7 +148,8 @@ For questions or comments feel free to email Frank Aylward at faylward _at_ vt d
 
 This tool requires Prodigal and HMMER3. Their citations are:
 
-Hyatt et al. “Prodigal: prokaryotic gene recognition and translation initiation site identification”. BMC bioinformatics, 2010. 
+Hyatt et al. “Prodigal: prokaryotic gene recognition and translation initiation site identification”. BMC bioinformatics, 2010.
+
 Eddy, "A new generation of homology search tools based on probabilistic inference". Genome Informatics, 2009. 
 
 
