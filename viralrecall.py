@@ -680,7 +680,7 @@ def main(argv=None):
 	args_parser.add_argument('-r', '--redo', type=bool, default=False, const=True, nargs='?', help='run without re-launching prodigal and HMMER3 (for quickly re-calculating outputs with different parameters if you have already run once)')
 	args_parser.add_argument('-c', '--contiglevel', type=bool, default=False, const=True, nargs='?', help='calculate contig/replicon level statistics instead of looking at viral regions (good for screening contigs)')
 	args_parser.add_argument('-f', '--figplot', type=bool, default=False, const=True, nargs='?', help='Specify this flag if you would like a plot of the viral-like regions with the output')
-	args_parser.add_argument('-v', '--version', action='version', version='ViralRecall v. 2.0')
+	args_parser.add_argument('-v', '--version', action='version', version='ViralRecall v. 2.1')
 	args_parser = args_parser.parse_args()
 
 	# set up object names for input/output/database folders
