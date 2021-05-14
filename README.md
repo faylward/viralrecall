@@ -32,9 +32,13 @@ To start:
 ViralRecall was tested on Ubuntu 16.04 and should work on most Unix-based systems. To see the help menu use:
 > python viralrecall.py -h
 
-Viralrecall can be run using either of two viral HMM databases: 1) VOGDB, which contains a wide collection of viral orthologous groups and is useful for broad characterization of viral signatures, or 2) GVOGs, a custom set of Giant Virus Orthologous Groups that are fairly specific to Nucleo-Cytoplasmic Large DNA Viruses (NCLDV). The GVOGs database has replaced the NCVOG database used in a prevous version. In addition, ViralRecall matches proteins against the Pfam database (Pfam v. 32), which is a broad-specificity database that detects many protein families that are common in the genomes of cellular organisms.
+Viralrecall can be run using either of two viral HMM databases: 
+1) GVOGs, a custom set of Giant Virus Orthologous Groups that are fairly specific to Nucleo-Cytoplasmic Large DNA Viruses (NCLDV), or
+2) VOGDB, which contains a wide collection of viral orthologous groups and is useful for broad characterization of viral signatures. 
 
-The database files are available for download from the Virginia Tech library system. To download and unpack, navigate to the folder that contains the viralrecall.py script and type:
+In addition to either the GVOG or VOGDB searches, ViralRecall matches proteins against the Pfam database (Pfam v. 32), which is a broad-specificity database that detects many protein families that are common in the genomes of cellular organisms.
+
+The database files are available for download from Zenodo. To download and unpack, navigate to the folder that contains the viralrecall.py script and type:
 
 > wget -O hmm.tar.gz https://zenodo.org/record/4762520/files/hmm.tar.gz?download=1
 
