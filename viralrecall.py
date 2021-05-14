@@ -51,7 +51,7 @@ def get_annot(database):
 		input = open("hmm/gvog_annotation.tsv", "r")
 		vdesc = defaultdict(lambda:"NA")
 		for i in input.readlines():
-			line = i.rstrip()
+			line = i.rstrip("\n")
 			tabs = line.split("\t")
 			vog = tabs[0]
 			desc = tabs[5]
@@ -606,6 +606,10 @@ def run_program(input, project, database, window, phagesize, minscore, minhit, e
 			if summary.shape[1] > 0:
 				summary.columns = ['replicon', 'start_coord', 'end_coord', 'vregion_length', 'contig_length', 'score', 'num_viralhits', 'num_ORFs', 'markers']
 				summary.to_csv(os.path.join(project, project+".summary.tsv"), sep="\t", index_label="viral_regions")
+			else:
+				summary_out = open(os.path.join(project, project+".summary.tsv"), "w")
+				summary_out.write('replicon\tstart_coord\tend_coord\tvregion_length\tcontig_length\tscore\tnum_viralhits\tnum_ORFs\tmarkers\n')
+
 
 			if database == "marker":
 				df2["vog"] = df2["vog"].replace(0, "no-search-performed")
