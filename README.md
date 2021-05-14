@@ -1,4 +1,4 @@
-# ViralRecall v. 2.0
+# ViralRecall
 ViralRecall is a flexible command-line tool for detecting signatures of giant viruses (NCLDV) in genomic data.
 Version 2 has been updated to focus more on NCLDV compared to version 1, but the original options are still available. 
 
