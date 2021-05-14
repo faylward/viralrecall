@@ -58,7 +58,7 @@ The output folder will contain:
 
 *.full_annot.tsv:        A full annotation table of the predicted ORFs. This includes descriptions of the GVOG and Pfam annotations, so it can be useful if you want to look at certain annoatations in more depth. 
 
-*.vregion.annot.tsv:    An annotation of only the viral regions (only present if some viral regions found)
+*.vregion.annot.tsv:    An annotation of only the regions with some viral signatures
 
 *summary.tsv:             Summary statistics for the predicted viral regions (or contig-level stats if the -c flag was used). This also includes the NCLDV marker output (marker hit: bit score)
 
