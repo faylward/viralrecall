@@ -23,12 +23,14 @@ def predict_proteins(genome_file, project, redo, batch):
 	if batch:
 		path_base = os.path.splitext(project)[0]
 		protein_file = os.path.join(path_base, file_base+".faa")
+		nuc_file = os.path.join(path_base, file_base+".fasta")
 	else:
 		base_name = os.path.basename(file_base)
 		#protein_file = os.path.join(project, re.sub('.fna', '.faa', base_name))
-		protein_file = os.path.join(project, project+".faa")	
+		protein_file = os.path.join(project, project+".faa")
+		nuc_file = os.path.join(project, project+".fasta")	# Added
 	
-	cmd = "prodigal -p meta -i "+ genome_file +" -a "+ protein_file
+	cmd = "prodigal -p meta -i "+ genome_file +" -a "+ protein_file + " -d "+ nuc_file
 	#print(cmd)
 	cmd2 = shlex.split(cmd)
 	if not redo:
