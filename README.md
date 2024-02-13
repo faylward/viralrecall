@@ -16,11 +16,12 @@ tools are installed in your PATH before using.
 A requirements.txt file is provided in this repo to solve some of the
 issues related to outdated pandas version. The requirements.txt file
 specifies conda environment dependencies so you don't have to install
-each separately. After cloning repository, please follow these steps:
+each separately. You will still have to install HMMer3 (follow instructions below). 
+After cloning repository, please follow these steps:
 
 ```         
 cd viralrecall
-conda create -n viralrecall -f requirements.txt
+conda create -n viralrecall --file requirements.txt
 ```
 
 If you wish to proceed without the requirements.txt file, simply remove
