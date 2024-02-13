@@ -25,7 +25,7 @@ conda create -n viralrecall --file requirements.txt
 ```
 
 If you wish to proceed without the requirements.txt file, simply remove
-`-f requirements.txt` from the above code. In that case you might have
+`--file requirements.txt` from the above code. In that case you might have
 to install some dependencies yourself. On a Unix system you should be
 able to install these tools with:
 
