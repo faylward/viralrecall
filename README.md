@@ -20,6 +20,9 @@ each separately.
 After cloning repository, please follow these steps:
 
 > cd viralrecall
+
+and 
+
 > conda env create -f requirements.yml
 
 If you wish to proceed without the requirements.yml file, simply create a conda 
