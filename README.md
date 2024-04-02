@@ -13,19 +13,17 @@ matplotlib, numpy, and pandas. ViralRecall uses Prodigal and HMMER3 for
 protein prediction and HMM searches, respectively. Please ensure these
 tools are installed in your PATH before using.
 
-A requirements.txt file is provided in this repo to solve some of the
-issues related to outdated pandas version. The requirements.txt file
+A requirements.yml file is provided in this repo to solve some of the
+issues related to outdated pandas version. The requirements.yml file
 specifies conda environment dependencies so you don't have to install
-each separately. You will still have to install HMMer3 (follow instructions below). 
+each separately. 
 After cloning repository, please follow these steps:
 
-```         
-cd viralrecall
-conda create -n viralrecall --file requirements.txt
-```
+> cd viralrecall
+> conda env create -f requirements.yml
 
-If you wish to proceed without the requirements.txt file, simply remove
-`--file requirements.txt` from the above code. In that case you might have
+If you wish to proceed without the requirements.yml file, simply create a conda 
+environment by typing `conda create -n viralrecall`. In that case you might have
 to install some dependencies yourself. On a Unix system you should be
 able to install these tools with:
 
