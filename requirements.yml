@@ -1,0 +1,56 @@
+name: viralrecall
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=2_gnu
+  - biopython=1.79=py37h540881e_2
+  - ca-certificates=2024.3.11=h06a4308_0
+  - cycler=0.11.0=pyhd8ed1ab_0
+  - freetype=2.12.1=hca18f0e_1
+  - hmmer=3.4=hdbdd923_1
+  - icu=67.1=he1b5a44_0
+  - kiwisolver=1.4.4=py37h7cecad7_0
+  - ld_impl_linux-64=2.40=h41732ed_0
+  - libblas=3.9.0=16_linux64_openblas
+  - libcblas=3.9.0=16_linux64_openblas
+  - libffi=3.4.2=h7f98852_5
+  - libgcc-ng=12.2.0=h65d4601_19
+  - libgfortran-ng=12.2.0=h69a702a_19
+  - libgfortran5=12.2.0=h337968e_19
+  - libgomp=12.2.0=h65d4601_19
+  - liblapack=3.9.0=16_linux64_openblas
+  - libnsl=2.0.0=h7f98852_0
+  - libopenblas=0.3.21=pthreads_h78a6416_3
+  - libpng=1.6.39=h753d276_0
+  - libsqlite=3.42.0=h2797004_0
+  - libstdcxx-ng=12.2.0=h46fd767_19
+  - libzlib=1.2.13=h166bdaf_4
+  - matplotlib=3.2.2=1
+  - matplotlib-base=3.2.2=py37h1d35a4c_1
+  - muscle=5.1=h4ac6f70_3
+  - natsort=8.3.1=pyhd8ed1ab_0
+  - ncurses=6.3=h27087fc_1
+  - numpy=1.21.6=py37h976b520_0
+  - openssl=3.2.1=hd590300_0
+  - pandas=1.0.5=py37h0da4684_0
+  - pip=23.1.2=pyhd8ed1ab_0
+  - prodigal=2.6.3=h031d066_7
+  - pyparsing=3.0.9=pyhd8ed1ab_0
+  - python=3.7.12=hf930737_100_cpython
+  - python-dateutil=2.8.2=pyhd8ed1ab_0
+  - python_abi=3.7=3_cp37m
+  - pytz=2023.3=pyhd8ed1ab_0
+  - readline=8.2=h8228510_1
+  - setuptools=59.8.0=py37h89c1867_1
+  - six=1.16.0=pyh6c4a22f_0
+  - sqlite=3.42.0=h2c6b66d_0
+  - tk=8.6.12=h27826a3_0
+  - tornado=6.2=py37h540881e_0
+  - typing-extensions=4.6.2=hd8ed1ab_0
+  - typing_extensions=4.6.2=pyha770c72_0
+  - wheel=0.40.0=pyhd8ed1ab_0
+  - xz=5.2.6=h166bdaf_0
+prefix: /home/abdeali/miniconda3/envs/viralrecall
