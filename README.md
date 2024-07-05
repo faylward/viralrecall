@@ -75,7 +75,7 @@ and unpack, navigate to the folder that contains the viralrecall.py
 script and type:
 
 > wget -O hmm.tar.gz
-> <https://zenodo.org/record/4762520/files/hmm.tar.gz?download=1>
+> <https://zenodo.org/records/12666277/files/hmm.tar.gz?download=1>
 
 and then
 
