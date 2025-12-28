@@ -3,9 +3,8 @@
 
 ## This new version is faster, easier to install, and has some new features that may be of interest. The 2.0 code will remain here but will no longer be maintained. 
 
-## Markdown for the 2.0 version is below
 
-# ViralRecall
+# ViralRecall v2.0
 
 ViralRecall is a flexible command-line tool for detecting signatures of
 giant viruses (NCLDV) in genomic data. Version 2 has been updated to
