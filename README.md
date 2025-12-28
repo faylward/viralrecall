@@ -1,6 +1,12 @@
 
 # ViralRecall
 
+*Note bene*, dear reader, a new and better version of this tool (v3.0) has been written by the intrepid Abdeali Jivaji and can be found here: https://github.com/abdealijivaji/ViralRecall_3.0
+
+This new version is faster, easier to install, and has some new features that may be of interest. The 2.0 code will remain here but will no longer be maintained. 
+
+
+
 ViralRecall is a flexible command-line tool for detecting signatures of
 giant viruses (NCLDV) in genomic data. Version 2 has been updated to
 focus more on NCLDV compared to version 1, but the original options are
